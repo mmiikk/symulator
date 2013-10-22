@@ -1,10 +1,10 @@
-var Scope = function(config){
+var Integrator = function(config){
     var settings = {
-        'id' : 'scope',
-        'name' : 'scope',
-        'type' : 'scope',
+        'id' : 'integrator',
+        'name' : 'integrator',
+        'type' : 'integrator',
         'in' : '1',
-        'out' : '0',
+        'out' : '1',
         'left' : '0',
         'top' : '0',
 
@@ -14,13 +14,13 @@ var Scope = function(config){
         
 }
 
-Scope.prototype.outputValue = function(){
-    return 5;        
+Integrator.prototype.outputValue = function(y,h){
+    return y*h;        
 }
-Scope.prototype.outputConfig = function(){
+Integrator.prototype.outputConfig = function(){
     return this.settings;        
 }
-Scope.prototype.setJsPlumb = function(){
+Integrator.prototype.setJsPlumb = function(){
     jsPlumb.ready(makeDraggable(this.settings.id));
   
     function makeDraggable(id){
@@ -29,11 +29,11 @@ Scope.prototype.setJsPlumb = function(){
         };
     }
 }
-Scope.prototype.updatePosition = function(){
+Integrator.prototype.updatePosition = function(){
     $('#'+this.settings.id).css('top',this.settings.top);
     $('#'+this.settings.id).css('left',this.settings.left);
     
-   $(document).ready(updatePosition(this.settings.id,this.settings));
+    $(document).ready(updatePosition(this.settings.id,this.settings));
    
     function updatePosition(id,set){
         return function(){
@@ -46,10 +46,24 @@ Scope.prototype.updatePosition = function(){
     }
 }
 
-Scope.prototype.setConnectors = function(){
+Integrator.prototype.setConnectors = function(){
     jsPlumb.ready(addInPoint(this.settings.id));
+    jsPlumb.ready(addOutPoint(this.settings.id));
     
     function addInPoint(id){
+        return function(){
+            jsPlumb.addEndpoint(id, {
+                endpoint:"Dot",
+                connectorPaintStyle: connectorPaintStyle,
+                paintStyle:{ fillStyle:"#1e8151",radius:7 },
+                anchor:positions.right,
+                isSource: true,
+                connector: connectorSettings,	
+            });
+        };
+    }
+    
+     function addOutPoint(id){
         return function(){
             jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
@@ -58,8 +72,8 @@ Scope.prototype.setConnectors = function(){
                         fillStyle:"transparent",
                         radius:7,
                         lineWidth:2 
-                },	
-                anchor:[ 0, 0.5, -1, 0 ],
+                },
+                anchor:[ 0, 0.4, -1, 0 ],
                 isTarget: true,
                 connector: connectorSettings,	
             });

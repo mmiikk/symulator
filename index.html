@@ -12,24 +12,34 @@
     <script src="lib/angular.min.js"></script>
     <script src="lib/adapter.js"></script>
     <script src="lib/jquery.jsPlumb-1.5.2-min.js"></script>
+    <script src="lib/jquery.flot.min.js"></script>
 
     <script src="lib/jquery-ui-1.10.3.custom.js"></script>
+    <script src="lib/underscore.js"></script>
     <script src="js/index.js"></script>
         
     <link rel="stylesheet" href="css/jquery.mobile-1.3.1.min.css" />
     <link rel="stylesheet" href="css/objects.css" />
     
+    <script src="js/solver.js"></script>
+    
     <script src="js/objects/step.js"></script>
     <script src="js/objects/scope.js"></script>
+    <script src="js/objects/integrator.js"></script>
+    <script src="js/objects/sum.js"></script>
+    <script src="js/objects/feedback.js"></script>
 </head>
 <body>
     <div data-role="page" id="main">
         <!-- Left side panel contain functions etc step, integrator, etc... -->
         <div data-role="panel" id="toolbox" ng-controller="Toolbox">
            <div class="spacer" ng-repeat="tool in tools">
-               <div id="{{tool.id}}" class="block">
-                   <span class="blockImage"></span>
-                   <span class="blockText">{{tool.name}}</span>
+               <div id="{{tool.id}}" class="block {{tool.type}}">
+                   <span class="blockImage">
+                       <span class="blockText">{{tool.name}}</span>
+                       
+                   </span>
+                   
                </div>
 
            </div>
@@ -39,19 +49,26 @@
         <div data-role="header">
             <h1>Symulator</h1>
             <a href="#toolbox" data-role="button" data-icon="bars" data-iconpos="notext" data-theme="a" data-inline="true"></a>
+            <a href="#" data-role="button" data-icon="check" data-iconpos="notext" data-theme="a" data-inline="true" id="run"></a>
         </div>
        
         <div data-role='content' ng-controller="Page" >
             <div id="page">
-                <div ng-repeat="object in objects" class="{{object.type}}" id="{{object.id}}">
-                    <span class="blockImage"></span>
-                    <span class="blockText">{{object.name}}</span>
+                <div ng-repeat="object in objects" class="block {{object.settings.type}}" id="{{object.settings.id}}">
+                    <span class="blockImage">
+                        <span class="blockText">{{object.settings.name}}</span>
+                        
+                    </span>
+                    
                 </div>
-                 <div ng-repeat="temp in temps" class="{{temp.type}}" id="temp">
-                    <span class="blockImage"></span>
-                    <span class="blockText">{{temp.name}}</span>
+                 <div ng-repeat="temp in temps" class="block {{temp.type}}" id="temp">
+                    <span class="blockImage">
+                        <span class="blockText">{{temp.name}}</span>
+                    </span>
+                    
                 </div>
             </div>
+            <div id="plot"></div>
         </div>
     </div>
         

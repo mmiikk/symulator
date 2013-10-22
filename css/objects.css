@@ -12,24 +12,79 @@ li {
 }
 .block{
     width:80px;
-    height:120px;
+    height:100px;
     position:absolute;
     overflow:hidden;
     margin:0 auto;
+    box-shadow: 2px 2px 19px #aaa;
+    -o-box-shadow: 2px 2px 19px #aaa;
+    -webkit-box-shadow: 2px 2px 19px #aaa;
+    -moz-box-shadow: 2px 2px 19px #aaa;
 }
 .block:hover{
     cursor:pointer;
 }
+.step .blockImage{
+    background:url('../img/step.png') no-repeat;
+    background-position: center 8px;
+}
+.scope .blockImage{
+    background:url('../img/scope.png') no-repeat;
+    background-position: center 8px;
+}
+.integrator .blockImage{
+    background:url('../img/integrator.png') no-repeat;
+    background-position: center 8px;
+}
+.feedback .blockImage{
+    background:url('../img/feedback.png') no-repeat;
+    background-position: center 8px;
+}
+.sum .blockImage{
+    background:url('../img/sum.png') no-repeat;
+    background-position: 0px 8px;
+}
+
+
+.remove{
+    background:url('../img/remove.png') no-repeat;
+    background-position: 0px 8px;
+    width:8px;
+    height:8px;
+    overflow:hidden;
+    display:none;
+    
+}
+.sum{
+    height:70px;
+    width:70px;
+    border-radius: 34px;
+}
+.sum .blockImage{
+    height:68px;  
+    width:68px;
+    border-radius: 34px;
+}
+
+
+.sum .blockText{
+    display:none;
+    
+}
 .blockImage{
     height:98px;
     width:78px;
-    border:1px solid black;
+    border: 1px solid #346789;
+    background: #eeeeef;
     float:left;
+    
     
 }
 .blockText{
     width:100%;
     text-align:center;
+    position:absolute;
+    top:75;
 }
 .invisible .blockImage{
     border:0px;
@@ -46,4 +101,14 @@ li {
 }
 button{
    /* display:none;   */ 
+}
+#plot{
+    width:500px;
+    height: 200px;
+        
+    
+}
+
+._jsPlumb_connector{
+    
 }

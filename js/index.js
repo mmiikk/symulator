@@ -3,28 +3,48 @@ function Toolbox($scope){
         {
             'id':'step',
             'name':'step',
-            'type':'block',
+            'type':'step',
                 
         },
         {
             'id':'scope',
             'name':'scope',
-            'type':'block',
+            'type':'scope',
                
-        }
+        },
+        {
+            'id':'integrator',
+            'name':'integrator',
+            'type':'integrator',
+               
+        },
+        {
+            'id':'sum',
+            'name':'sum',
+            'type':'sum',
+               
+        },
+        {
+            'id':'feedback',
+            'name':'feedback',
+            'type':'feedback',
+               
+        },
        
     ];
      
 }
 
 $(document).ready(function(){
-    
+   $('#run').click(function(){
+      $().solver('init',[jsPlumb.getAllConnections(),angular.element('[ng-controller=Page]').scope().objects]);   
+   });
    $('.spacer').each(function(){
      
       $(this).draggable({
            start: function(event, ui){
                //add  temporary object to page
-               angular.element('[ng-controller=Page]').scope().addTemp($(this).children()[0].id,'block');
+               angular.element('[ng-controller=Page]').scope().addTemp($(this).children()[0].id);
                $(this).children().addClass('invisible');
                
            },
@@ -56,10 +76,12 @@ function Page($scope){
     
     $scope.temps = [];
 
-    $scope.addTemp = function(name,type){
+    $scope.addTemp = function(name){
+        var type = _.filter(angular.element('[ng-controller=Toolbox]').scope().tools,function(obj){ return obj.id == name});
+        
         $scope.temps.push({
            'name':name,
-           'type':type,
+           'type':type[0].type,
         });
         $scope.$apply();
     }
@@ -92,16 +114,39 @@ function Page($scope){
                                  'top':position.top,
                     });
                 break;
+            case 'integrator':
+                    var block = new Integrator({'id':id+getMaxID(),
+                                 'name':id + ' ' + getMaxID(),
+                                 'left':position.left-toolboxWidth,
+                                 'top':position.top,
+                    });
+                break;
+           case 'sum':
+                    var block = new Sum({'id':id+getMaxID(),
+                                 'name':id + ' ' + getMaxID(),
+                                 'left':position.left-toolboxWidth,
+                                 'top':position.top,
+                    });
+                break;
+            case 'feedback':
+                    var block = new Feedback({'id':id+getMaxID(),
+                                 'name':id + ' ' + getMaxID(),
+                                 'left':position.left-toolboxWidth,
+                                 'top':position.top,
+                    });
+                break;
            
         }
               
        
         
-        $scope.objects.push( block.settings ) ;
+        $scope.objects.push( block ) ;
+        console.log($scope.objects);
         $scope.$apply();
         
         block.setJsPlumb();
-        block.updatePosition();
+        console.log('a');
+        block.updatePosition(); console.log('a');
         block.setConnectors();
             
                 
@@ -109,7 +154,7 @@ function Page($scope){
     
     $scope.updatePosition = function(top,left)
     {
-        console.log($scope.objects[0].id);
+        
         $('#'+getLastID()).css({'top':top,'left':left});
         
     }
@@ -118,11 +163,30 @@ function Page($scope){
         return ($scope.objects.length);
     }
     function getLastID(){
-        return ($scope.objects[($scope.objects.length-1)].id);
+        return ($scope.objects[($scope.objects.length-1)].settings.id);
     }
     
     
     
 }
 
+jsPlumb.ready(function(){
+   jsPlumb.Defaults.ConnectionOverlays =[ ["Arrow", { location:1 } ] ]; 
+});
+
 var connectorSettings = [ "Flowchart", { stub:[40, 60], gap:10, cornerRadius:5, alwaysRespectStubs:true } ];
+
+var positions = {
+  left: [ 0, 0.4, -1, 0 ],
+  right:  [ 1, 0.4, 1, 0 ],
+  top:   [ 0.5, 0 , -0.5, 0],
+  bottom:   [ 0.5, 1 , 0, 0],
+};
+
+var connectorPaintStyle = {
+				lineWidth:4,
+				strokeStyle:"#deea18",
+				joinstyle:"round",
+				outlineColor:"#eaedef",
+				outlineWidth:2
+			};

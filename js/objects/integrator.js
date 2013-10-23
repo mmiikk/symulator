@@ -22,7 +22,7 @@ Integrator.prototype.outputConfig = function(){
 }
 Integrator.prototype.setJsPlumb = function(){
     jsPlumb.ready(makeDraggable(this.settings.id));
-  
+    $(document).ready(clickable(this.settings.id));
     function makeDraggable(id){
         return function(){
             jsPlumb.draggable(id);
@@ -54,7 +54,7 @@ Integrator.prototype.setConnectors = function(){
         return function(){
             jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
-                connectorPaintStyle: connectorPaintStyle,
+                connectorStyle: connectorPaintStyle,
                 paintStyle:{ fillStyle:"#1e8151",radius:7 },
                 anchor:positions.right,
                 isSource: true,

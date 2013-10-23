@@ -22,7 +22,7 @@ Sum.prototype.outputConfig = function(){
 }
 Sum.prototype.setJsPlumb = function(){
     jsPlumb.ready(makeDraggable(this.settings.id));
-  
+    $(document).ready(clickable(this.settings.id));
     function makeDraggable(id){
         return function(){
             jsPlumb.draggable(id);
@@ -59,7 +59,7 @@ Sum.prototype.setConnectors = function(){
                 anchor:position,
                 isSource: true,
                 connector: connectorSettings,
-                connectorPaintStyle: connectorPaintStyle,
+                connectorStyle: connectorPaintStyle,
                 paintStyle:{ fillStyle:"#1e8151",radius:7 },
                 
             });

@@ -22,7 +22,7 @@ Step.prototype.outputConfig = function(){
 }
 Step.prototype.setJsPlumb = function(){
     jsPlumb.ready(makeDraggable(this.settings.id));
-  
+    $(document).ready(clickable(this.settings.id));
     function makeDraggable(id){
         return function(){
             jsPlumb.draggable(id);
@@ -51,12 +51,11 @@ Step.prototype.setConnectors = function(){
     jsPlumb.ready(addInPoint(this.settings.id));
     
     function addInPoint(id){
-        console.log(connectorPaintStyle);
+        
         return function(){console.log(id);
             jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
-                connectorPaintStyle:{ strokeStyle:"blue", lineWidth:10 },
-                
+                connectorStyle:connectorPaintStyle,
                 paintStyle:{ fillStyle:"#1e8151",radius:7 },
                 anchor:[ 1, 0.5, 1, 0 ],
                 isSource: true,

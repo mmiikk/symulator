@@ -66,7 +66,12 @@ $(document).ready(function(){
                $(this).css('top','0px');
            }
        }); 
+       
+             
    });
+   
+  
+   
 });
 
 function Page($scope){
@@ -94,6 +99,17 @@ function Page($scope){
     $scope.removeTemp = function(){
         $scope.temps = [];
         $scope.$apply();
+    }
+    
+    $scope.removeObject = function(id){
+        var oldObjects = $scope.objects;
+        //console.log(id);
+        $scope.objects = [];
+        angular.forEach(oldObjects, function(object) {
+            //console.log(object);
+            if (object.settings.id!==id) $scope.objects.push(object);
+          });
+        //console.log($scope.objects);
     }
     
     $scope.addObject = function(position, toolboxWidth, id){
@@ -172,15 +188,16 @@ function Page($scope){
 
 jsPlumb.ready(function(){
    jsPlumb.Defaults.ConnectionOverlays =[ ["Arrow", { location:1 } ] ]; 
+   jsPlumb.Defaults.Connector = [ "Flowchart", { stub:[40, 60], gap:1, cornerRadius:5, alwaysRespectStubs:true } ];		
 });
 
-var connectorSettings = [ "Flowchart", { stub:[40, 60], gap:10, cornerRadius:5, alwaysRespectStubs:true } ];
+var connectorSettings = [ "Flowchart", { stub:[100, 100], gap:1, cornerRadius:5, alwaysRespectStubs:false, midPoint: 1 } ];
 
 var positions = {
   left: [ 0, 0.4, -1, 0 ],
   right:  [ 1, 0.4, 1, 0 ],
   top:   [ 0.5, 0 , -0.5, 0],
-  bottom:   [ 0.5, 1 , 0, 0],
+  bottom:   [ 0.5, 1 , 0, 1],
 };
 
 var connectorPaintStyle = {
@@ -190,3 +207,45 @@ var connectorPaintStyle = {
 				outlineColor:"#eaedef",
 				outlineWidth:2
 			};
+                        
+function clickable(selector){
+    return function(){
+        var obj = $('#page').find('#'+selector);
+            obj.click(function(){
+               
+                if(obj.hasClass('clicked'))
+                    {
+                        obj.removeClass('clicked');
+                        $('#remove').addClass('ui-disabled');
+                    }
+                else
+                    {
+                        obj.addClass('clicked');
+                        $('#remove').removeClass('ui-disabled');
+                    }
+                
+                
+            });
+        
+    };
+}
+
+$(document).ready(function(){
+   $('#remove').bind('click',function(event,ui){
+       
+       console.log($('#page').find('.clicked'));
+       var toDelete = $('#page').find('.clicked');
+       console.log(jsPlumb);
+       for(var i=0; i< toDelete.length; i++)
+           {
+               angular.element('[ng-controller=Page]').scope().removeObject(toDelete[i].id);
+               jsPlumb.deleteEveryEndpoint(toDelete[i]);
+               jsPlumb.detachAllConnections(toDelete[i]);
+               
+
+               $(toDelete[i]).remove();
+           }
+       $(this).addClass('ui-disabled');
+      // $('.ui-btn-active').removeClass('ui-btn-active');
+   });
+});

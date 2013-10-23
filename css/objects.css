@@ -112,3 +112,7 @@ button{
 ._jsPlumb_connector{
     
 }
+
+.clicked{
+    background:pink;
+}

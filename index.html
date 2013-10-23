@@ -50,8 +50,13 @@
             <h1>Symulator</h1>
             <a href="#toolbox" data-role="button" data-icon="bars" data-iconpos="notext" data-theme="a" data-inline="true"></a>
             <a href="#" data-role="button" data-icon="check" data-iconpos="notext" data-theme="a" data-inline="true" id="run"></a>
+            <div data-role="navbar" data-iconpos="bottom">
+		<ul>
+			<li><button data-icon="deleted" id="remove" class="ui-disabled" data-role="button" >Usun</button></li>
+		</ul>
+            </div><!-- /navbar -->
         </div>
-       
+        
         <div data-role='content' ng-controller="Page" >
             <div id="page">
                 <div ng-repeat="object in objects" class="block {{object.settings.type}}" id="{{object.settings.id}}">

@@ -22,7 +22,7 @@ Scope.prototype.outputConfig = function(){
 }
 Scope.prototype.setJsPlumb = function(){
     jsPlumb.ready(makeDraggable(this.settings.id));
-  
+    $(document).ready(clickable(this.settings.id));
     function makeDraggable(id){
         return function(){
             jsPlumb.draggable(id);

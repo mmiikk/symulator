@@ -113,12 +113,12 @@ function Page($scope){
     }
     
     $scope.addObject = function(position, toolboxWidth, id){
-        
+        //console.log(toolboxWidth);
         switch (id){
             case 'step':
                     var block = new Step({'id':id+getMaxID(),
                                  'name':id + ' ' + getMaxID(),
-                                 'left':position.left-toolboxWidth,
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
                     });
                 break;
@@ -126,28 +126,28 @@ function Page($scope){
             case 'scope':
                     var block = new Scope({'id':id+getMaxID(),
                                  'name':id + ' ' + getMaxID(),
-                                 'left':position.left-toolboxWidth,
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
                     });
                 break;
             case 'integrator':
                     var block = new Integrator({'id':id+getMaxID(),
                                  'name':id + ' ' + getMaxID(),
-                                 'left':position.left-toolboxWidth,
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
                     });
                 break;
            case 'sum':
                     var block = new Sum({'id':id+getMaxID(),
                                  'name':id + ' ' + getMaxID(),
-                                 'left':position.left-toolboxWidth,
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
                     });
                 break;
             case 'feedback':
                     var block = new Feedback({'id':id+getMaxID(),
                                  'name':id + ' ' + getMaxID(),
-                                 'left':position.left-toolboxWidth,
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
                     });
                 break;
@@ -248,4 +248,19 @@ $(document).ready(function(){
        $(this).addClass('ui-disabled');
       // $('.ui-btn-active').removeClass('ui-btn-active');
    });
+   
+   $('#build').bind('click',function(event,ui){
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'step'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'600px',top:'100px'}, $('#toolbox').width(), 'scope'  );
+
+        //jsPlumb.connect({source:'step0',target:'sum1'});
+
+   });
+   
+   
 });

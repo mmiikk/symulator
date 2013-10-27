@@ -49,10 +49,10 @@ Sum.prototype.updatePosition = function(){
 Sum.prototype.setConnectors = function(){
     
     jsPlumb.ready(addTarget(this.settings.id,positions.left));
-    jsPlumb.ready(addTarget(this.settings.id,positions.bottom));
-    jsPlumb.ready(addSource(this.settings.id,positions.right));
+    jsPlumb.ready(addTarget(this.settings.id,positions.bottom,'minus'));
+    jsPlumb.ready(addSource(this.settings.id,positions.right,'add'));
     
-    function addSource(id,position){
+    function addSource(id,position,label){
         return function(){console.log(position);
             jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
@@ -60,6 +60,7 @@ Sum.prototype.setConnectors = function(){
                 isSource: true,
                 connector: connectorSettings,
                 connectorStyle: connectorPaintStyle,
+                overlays:   [[ "Label", { label:label, id:"label", location:[-0.5, -0.5] } ]],
                 paintStyle:{ fillStyle:"#1e8151",radius:7 },
                 
             });

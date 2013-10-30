@@ -10,12 +10,15 @@ var Scope = function(config){
 
 
     };
+    this.previousValues = [0];
     this.settings = $.extend({},settings,config);
-        
+   // this.previousValues = $.extend({},previousValues,null);
+    
 }
 
-Scope.prototype.outputValue = function(){
-    return 5;        
+Scope.prototype.outputValue = function(y){
+    console.log(this);
+    return this.previousValues.push(y);        
 }
 Scope.prototype.outputConfig = function(){
     return this.settings;        

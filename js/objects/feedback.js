@@ -11,11 +11,15 @@ var Feedback = function(config){
 
     };
     this.settings = $.extend({},settings,config);
-        
+    
+    var previousValues = 0;
 }
 
-Feedback.prototype.outputValue = function(y,h){
-    return y*h;        
+Feedback.prototype.outputValue = function(){
+    return this.previousValues;        
+}
+Feedback.prototype.updatePreviousValues = function(value){
+    this.previousValues = value;
 }
 Feedback.prototype.outputConfig = function(){
     return this.settings;        

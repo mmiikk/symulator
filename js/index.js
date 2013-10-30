@@ -252,15 +252,44 @@ $(document).ready(function(){
    $('#build').bind('click',function(event,ui){
         angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'step'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
+       // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+       // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'600px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
+         angular.element('[ng-controller=Page]').scope().addObject( {left:'700px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'800px',top:'100px'}, $('#toolbox').width(), 'scope'  );
+//angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'450px'}, $('#toolbox').width(), 'integrator'  );
+//
+//
+//
+        //jsPlumb.connect({source:'step0',target:'sum1'});
+
+/*
+ * 
+ *  angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'step'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'sum'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
+       // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+       // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'600px',top:'100px'}, $('#toolbox').width(), 'scope'  );
-
-        //jsPlumb.connect({source:'step0',target:'sum1'});
+//angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'450px'}, $('#toolbox').width(), 'integrator'  );
+ */
 
    });
    
    
 });
+
+Array.prototype.move = function (old_index, new_index) {
+    if (new_index >= this.length) {
+        var k = new_index - this.length;
+        while ((k--) + 1) {
+            this.push(undefined);
+        }
+    }
+    this.splice(new_index, 0, this.splice(old_index, 1)[0]);
+    return this; // for testing purposes
+};

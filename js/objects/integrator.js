@@ -10,12 +10,15 @@ var Integrator = function(config){
 
 
     };
+    this.previousValues = 0;
     this.settings = $.extend({},settings,config);
         
 }
 
 Integrator.prototype.outputValue = function(y,h){
-    return y*h;        
+    var output = this.previousValues + y*h;
+    this.previousValues = output;
+    return output;        
 }
 Integrator.prototype.outputConfig = function(){
     return this.settings;        

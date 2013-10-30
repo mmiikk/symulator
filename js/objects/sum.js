@@ -11,12 +11,21 @@ var Sum = function(config){
 
     };
     this.settings = $.extend({},settings,config);
-        
+    this.previousValues = {
+        'sub' : 0,
+        'add' : 0,
+    }
 }
 
-Sum.prototype.outputValue = function(y,h){
-    return y*h;        
+Sum.prototype.outputValue = function(){
+    return parseFloat( this.previousValues.add ) - parseFloat( this.previousValues.sub );        
 }
+Sum.prototype.updatePreviousValues = function(func,value){
+    console.log( this.previousValues[func]);
+    this.previousValues[func]=value;
+    console.log( this.previousValues[func]);
+}
+
 Sum.prototype.outputConfig = function(){
     return this.settings;        
 }
@@ -48,9 +57,9 @@ Sum.prototype.updatePosition = function(){
 
 Sum.prototype.setConnectors = function(){
     
-    jsPlumb.ready(addTarget(this.settings.id,positions.left));
-    jsPlumb.ready(addTarget(this.settings.id,positions.bottom,'minus'));
-    jsPlumb.ready(addSource(this.settings.id,positions.right,'add'));
+    jsPlumb.ready(addTarget(this.settings.id,positions.left,'add'));
+    jsPlumb.ready(addTarget(this.settings.id,positions.bottom,'sub'));
+    jsPlumb.ready(addSource(this.settings.id,positions.right));
     
     function addSource(id,position,label){
         return function(){console.log(position);
@@ -67,7 +76,7 @@ Sum.prototype.setConnectors = function(){
         };
     }
     
-     function addTarget(id,position){
+     function addTarget(id,position,func){
         return function(){
             jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
@@ -81,9 +90,9 @@ Sum.prototype.setConnectors = function(){
                 anchor:position,
                 isTarget: true,
                 connector: connectorSettings,	
-                parameters:{ 'position' : positions.left,
-                'a':4,
-            'b':6}
+                parameters:{ 
+                    'func' : func,
+                }
             });
         };
     }

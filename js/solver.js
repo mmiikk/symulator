@@ -45,13 +45,149 @@
     function removeConnection(obj)
     {
         return _.indexOf(connections,obj);
-      /*  for(var i=0;i<connections.length;i++)
+     
+    }
+    
+    function getObjectByType(objects,type)
+    {
+        return  _.filter(objects,function(obj){ return obj.settings.type === type});        
+    }
+    
+    function getObjectById(objects,id)
+    {
+        return  _.filter(objects,function(obj){ return obj.settings.id === id});        
+    }
+    
+    
+    function buildBranchBySourceType(type,connContainer)
+    {
+        var order = [];
+        var sourcesBlocks = getObjectByType(objects,type); //get all source objects by type
+        var sourceBlock = null; 
+        var blockConnections = [];
+        
+        //Sort object - first on the left starts
+        sourcesBlocks.sort(function(a,b){return a.settings.left-b.settings.right});
+
+        //Explore connections array and build branch from start(source) to end(scope, sum ...)
+        for(var i=0; i<sourcesBlocks.length ; i++)
         {
-            console.log(obj);
-            console.log(connections[i]);
-            if(connections[i].sourceId == obj.sourceId && connections[i].targetId == obj.targetId)
-                return i;
-        }*/
+            //get source blocks
+            sourceBlock = sourcesBlocks[i];
+            //get blocks connections, where is as source
+            blockConnections = findConnection(sourceBlock.settings.id,null);
+
+            //push connection to array 
+            //current block(sourceBlock) become start of the branch
+            if( typeof blockConnections[0] === 'object' ) 
+                order.push(blockConnections);
+            else
+                order.push(blockConnections[0]);
+            
+            
+            //remove connection from connections array        
+            connections.splice(removeConnection(blockConnections[0]),1);
+            
+            sourceBlock = blockConnections[0].targetId;
+
+            //find route from first block to the end of branch
+            //end loop when no other connections found - sum, scope detected
+            while(findConnection(sourceBlock,null).length !== 0)
+            {
+                blockConnections = findConnection(sourceBlock,null);
+
+                order.push([blockConnections[0]]);
+                sourceBlock = blockConnections[0].targetId;
+                connections.splice(removeConnection(blockConnections[0]),1);
+
+
+            }
+            connContainer.push(order);
+            order=[];
+        }
+        return connContainer;
+    }
+    
+    function orderBranchesByPriority(connContainer)
+    {
+        //get Last element of the branch
+        function getLastElementTarget(elements)
+        {
+            var len =parseInt(elements.length-1);
+            return elements[len][0].targetId;
+        }
+        //get first Element of the branch
+        function getFirstElementSource(elements)
+        {
+            return elements[0][0].sourceId;
+        }
+        //find branch poition in Array
+        function findElementPosition(notThisIndex,objectId)
+        {
+            for(var i=0; i<connContainer.length ;i++)
+            {
+                if(i!==notThisIndex)
+                {
+                    for(var j=0; j<connContainer[i].length ;j++)
+                    {
+
+                        if(connContainer[i][j][0].sourceId===objectId)
+                            return i;
+                    }
+                }
+            }
+             return null;
+        }
+        
+        function moveBranch(connContainer,i)
+        {
+            connContainer.move(newPos,i);
+            i=parseInt(connContainer.length-1);
+            return i;
+        }
+        
+        var lastElement = null;
+        var firstElement = null;
+        var newPos = null;
+        
+        //for loop from end to start
+        for(var i=parseInt(connContainer.length-1); i>0 ;i--)
+        {
+            //get target of the branch
+            lastElement = getObjectById(objects,getLastElementTarget(connContainer[i]));
+
+            // if branch target is object 'sum', it's necessary to put this branch in correct order
+            if(lastElement[0].settings.type === 'sum')
+            {
+                //get source from branch where target is 'sum'
+                firstElement = getObjectById(objects,getFirstElementSource(connContainer[i]));
+
+                //if source is feedback this must be after branch where feedback is as target
+                if(firstElement[0].settings.type === 'feedback')
+                {
+                    //get new position
+                    newPos = findElementPosition(firstElement[0].settings.id);
+                    //if branch is before 'parent' move it after 
+                    if(newPos > i )
+                    {
+                        i=moveBranch(connContainer,i);
+                    }
+
+                } 
+                else
+                {
+                    newPos = connContainer.move(i,findElementPosition(i,firstElement[0].settings.id));
+                    //if branch is before 'parent' move it before
+                    if(newPos < i )
+                    {
+                        i=moveBranch(connContainer,i);
+                    }
+                }
+
+
+            }
+                
+        }
     }
     
     methods = {	
@@ -61,163 +197,21 @@
 	 */			
 	init : function(model){
             
-           // var f = _.filter(model[1],function(obj){ return obj.type == 'step'});
-           // var min = _.min(f, function(obj){ return obj.left; });
-            //var con = getConnections(model[0]);
-            
-            objects = model[1];
-            getConnections(model[0]);
-            console.log(model[0][0].endpoints[1].getParameters());
-           // console.log(.getOverlays('label'));
-           // var start = findStart();
-         //   console.log(start.settings.id);
-            
-            var order = [];
-            var Order = [];
-            var sourcesBlocks = _.filter(objects,function(obj){ return obj.settings.type == 'step'});
-            sourcesBlocks.sort(function(a,b){return a.settings.left-b.settings.right});
-          //  console.log(sourcesBlocks);
+            objects = model[1]; // Blocks (step, sum etc... )
+            getConnections(model[0]);   //Connection between blocks
           
-            for(var i=0; i<sourcesBlocks.length ; i++)
-            {
-                var start = sourcesBlocks[i];
-               // console.log(start);
-                 var found = findConnection(start.settings.id,null);
-                    
-                   // console.log(found);
-                    order.push(found);
-                    start = found[0].targetId;
-                    connections.splice(removeConnection(found[0]),1);
-                   // console.log(connections);
-                    //var found = findConnection(start,null);
-                    while(findConnection(start,null).length !== 0)
-                        {
-                              var found = findConnection(start,null);
-
-                            console.log(found);
-                            //if(found.length > 1)
-                                order.push([found[0]]);
-                            start = found[0].targetId;
-                            connections.splice(removeConnection(found[0]),1);
-                           // console.log(connections);
-                            var found = findConnection(start,null);
-                            //console.log(start);
-
-                       }
-                       Order.push(order);
-                       order=[];
-            }
-            //console.log(order);
-            //console.log(connections);
             
-            var sourcesBlocks = _.filter(objects,function(obj){ return obj.settings.type == 'feedback'});
-            for(var i=0; i<sourcesBlocks.length ; i++)
-            {
-                var start = sourcesBlocks[i];
-             //   console.log(start);
-                 var found = findConnection(start.settings.id,null);
-                    
-                  //  console.log(found);
-                    order.push(found);
-                    start = found[0].targetId;
-                    connections.splice(removeConnection(found[0]),1);
-                //    console.log(connections);
-                    //var found = findConnection(start,null);
-                    while(findConnection(start,null).length !== 0)
-                        {
-                              var found = findConnection(start,null);
-
-                      //      console.log(found);
-                            order.push(found);
-                            start = found[0].targetId;
-                            connections.splice(removeConnection(found[0]),1);
-                      //      console.log(connections);
-                            var found = findConnection(start,null);
-                     //       console.log(start);
-
-                       }
-                       Order.push(order);
-                       order=[];
+            var Order = [];
             
-            }
-            console.log('####');
-            console.log(Order);
-            
-        //    var sums = _.filter(objects,function(obj){ return obj.settings.type == 'sum'});
-       //     console.log(sums);
-        
-            function getlastElement(elements)
-            {
-                var len =parseInt(elements.length-1);
-                return elements[len][0].targetId;
-            }
-            function getfirstElement(elements)
-            {
-                return elements[0][0].sourceId;
-            }
-            function findElementPosition(notThisIndex,objectId)
-            {
-                for(var i=0; i<Order.length ;i++)
-                    {
-                        if(i!==notThisIndex)
-                            {
-                                for(var j=0; j<Order[i].length ;j++)
-                                    {
-                                        
-                                        if(Order[i][j][0].sourceId===objectId)
-                                            return i;
-                                    }
-                            }
-                    }
-                 return null;
-            }
-        
-            for(var i=parseInt(Order.length-1); i>0 ;i--)
-                {
-                   // console.log(Order[i]);
-                  //  console.log(lastElement(Order[i]));
-                    
-                    var lastElement = _.filter(objects,function(obj){ return obj.settings.id === getlastElement(Order[i])});
-                    console.log(lastElement);
-                    console.log(lastElement[0].settings.type);
-                    if(lastElement[0].settings.type === 'sum')
-                        {
-                            
-                            var firstElement = _.filter(objects,function(obj){ return obj.settings.id === getfirstElement(Order[i])});
-                            console.log(firstElement);
-                            if(firstElement[0].settings.type === 'feedback')
-                            {
-                                console.log(findElementPosition(i,firstElement[0].settings.id));
-                                var newPos = findElementPosition(firstElement[0].settings.id);
-                                if(newPos > i )
-                                    {
-                                    Order.move(newPos,i);
-                                    i=parseInt(Order.length-1);
-                                    }
-                                console.log('####');
-                                console.log(Order);
-
-                            } 
-                            else
-                                {
-                                     //Order.move(i,findElementPosition(i,firstElement[0].settings.id));
-                                      var newPos = Order.move(i,findElementPosition(i,firstElement[0].settings.id));
-                                    if(newPos < i )
-                                        {
-                                        Order.move(newPos,i);
-                                        i=parseInt(Order.length-1);
-                                        }
-                                }
-                            
-                            
-                        }
-                
-                }
+            Order = buildBranchBySourceType('step',Order); //Build branches as array row, where source is step
+            Order = buildBranchBySourceType('feedback',Order); //Build branches as array row, where source is feedback
+                     
+            orderBranchesByPriority(Order); //make Order in correct order
             
                 var  y = 0 ;
                 var time = 0;
                 //var
-                
+                console.time('someFunction timer');
                 while(time<50)
                     {
                      console.log('####');
@@ -275,67 +269,10 @@
                             }
                             time= time+0.1;
                   }
-                            
+                       console.timeEnd('someFunction timer')     
                     console.log(objects[4]);
-        /*   for(var i=Order.length; i>=0 ;i--)
-               {
-                   //if(Order)
-                    //   _.filter(objects,function(obj){ return obj.settings.id == 'sum'});
-                    console.log(Order[i]);
-                    console.log(Order[i][parseInt(Order[i].length-1)])
-               
-               }
-            
-            */
-           
-          /*   for(var i=0; i < Order.length ;i++)
-                {
-                     for(var j=0 ; j< Order[i].length; j++)
-                        {
-                             var ob = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].sourceId });
-                             console.log(ob);
-                        }
-                
-                }
-            */
-           /* console.log(model[0]);
-            console.log(model[0][0].endpoints[1].getOverlays()[0].getLabel());
-            console.log(connections[0].getParameters());*/
-          /*  var blocks = model[1];
-            
-            
-            var f = _.filter(model[1],function(obj){ return obj.settings.type == 'step'});
-            var start = _.min(f, function(obj){ return obj.settings.left; });
-            
-            var start_con = _.filter(connections,function(obj) {return obj.sourceId == start.settings.id });
-            console.log(start);
-            console.log(start_con);
-            
-            var y=start.outputValue();
-            console.log(y);
-            
-            console.log(start_con['targetId']);
-            var f = _.filter(blocks,function(obj){ return obj.settings.id == start_con[0].targetId});
-            console.log(f);
-            var f_con = _.filter(connections,function(obj) {return obj.sourceId == f[0].id });
-            console.log(f_con);
-            
-            y=f[0].outputValue(y);
-            console.log(y);
-            */
-          /*  
-            var block = _.filter(model[1],function(obj){ return obj.id == start.targetId});
-            var con = _.filter(connections,function(obj) {return obj.sourceId == min.id });
-            
-            y=block.outputVal(y);
-            console.log(y);
-            
-            console.log(min);
-            console.log(connections);
-            console.log(model[0]);
-            console.log(start);
-            console.log(startObj);
-		*/
+        
+        
                 var data = [];
                 var f = _.filter(objects,function(obj){ return obj.settings.type == 'scope'});
                 for(i=0;i<f[0].previousValues.length;i++)

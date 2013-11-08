@@ -1,7 +1,6 @@
-
-
 var Step = function(config){
-    var settings = {
+   
+    var basicConfig = {
         'id' : 'step',
         'name' : 'step',
         'type' : 'step',
@@ -13,11 +12,30 @@ var Step = function(config){
 
     };
     
-    this.settings = $.extend({},settings,config);
-        console.log(this);
+    this.settings = $.extend({},this.settings,basicConfig);
+    
+    this.settings = $.extend({},this.settings,config);
+    
+    this.endpoints = $.extend([],this.endpoints,[]);
+    
+    this.previousValues = {
+        'start' : 0,
+        'end' : 1,
+        'delay' : 0,
+    };
+    
+    this.parameters = [
+        {   
+            'type' : 'input',
+            'label' : 'Wartoœæ koñcowa',
+            'value' : this.previousValues.end,
+        }
+    ];
 }
 
 Step.prototype = new Block();
-Step.prototype.outputValue = function(){
-    return 5;        
+Step.prototype.outputValue = function(y,h,time){
+    console.log(this.previousValues.end);
+    if(time>=this.previousValues.delay)
+        return  5;        
 }

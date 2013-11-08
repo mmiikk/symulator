@@ -1,99 +1,65 @@
 var Sum = function(config){
-    var settings = {
+    var basicConfig = {
         'id' : 'sum',
         'name' : 'sum',
         'type' : 'sum',
-        'in' : '2',
+        'in' : '3',
         'out' : '1',
         'left' : '0',
         'top' : '0',
-
+        'inPos' : [positions.left,positions.bottom,positions.top],
+        'outPos' : [positions.right],
+        'inFunc' : ['add','sub','sub'],
+        'outFunc' : [null],
 
     };
-    this.settings = $.extend({},settings,config);
-    this.previousValues = {
-        'sub' : 0,
-        'add' : 0,
+    
+    updateFunc(basicConfig.inFunc);
+    
+    this.settings = $.extend({},this.settings,basicConfig);
+    
+    this.settings = $.extend({},this.settings,config);
+    this.previousValues = buildPreviousValuesObject(basicConfig.inFunc);
+    this.endpoints = $.extend([],this.endpoints,[]);
+   
+    this.outputValue();
+    
+    function updateFunc(functions){
+        for(var i=0;i<functions.length;i++)
+        {
+            functions[i]=functions[i]+i;
+        }
+    }
+    function buildPreviousValuesObject(functions)
+    {
+        var prevVal = {};
+        for(var i=0;i<functions.length;i++)
+        {
+            prevVal[functions[i]]=0;
+        }
+        return prevVal;
     }
 }
 
+Sum.prototype = new Block();
 Sum.prototype.outputValue = function(){
-    return parseFloat( this.previousValues.add ) - parseFloat( this.previousValues.sub );        
+    var outVal = 0;
+    
+    for(var i=0;i<this.settings.inFunc.length;i++)
+    {
+        
+        if(this.settings.inFunc[i].indexOf('add') === -1)
+            outVal = parseFloat( outVal - this.previousValues[this.settings.inFunc[i]] );
+        else
+           outVal = parseFloat( outVal + this.previousValues[this.settings.inFunc[i]] );
+    }
+    //console.log(outVal);
+    return outVal;
 }
 Sum.prototype.updatePreviousValues = function(func,value){
-    console.log( this.previousValues[func]);
+    console.log(func);
+    console.log(this.previousValues);
+    console.log(this.previousValues[func]);
+    console.log(value);
     this.previousValues[func]=value;
-    console.log( this.previousValues[func]);
-}
-
-Sum.prototype.outputConfig = function(){
-    return this.settings;        
-}
-Sum.prototype.setJsPlumb = function(){
-    jsPlumb.ready(makeDraggable(this.settings.id));
-    $(document).ready(clickable(this.settings.id));
-    function makeDraggable(id){
-        return function(){
-            jsPlumb.draggable(id);
-        };
-    }
-}
-Sum.prototype.updatePosition = function(){
-    $('#'+this.settings.id).css('top',this.settings.top);
-    $('#'+this.settings.id).css('left',this.settings.left);
-    
-    $(document).ready(updatePosition(this.settings.id,this.settings));
-   
-    function updatePosition(id,set){
-        return function(){
-            $( '#'+id).on( "drag", function( event, ui ) {
-                set.top = parseInt($('#'+id).css('top'));
-                set.left = parseInt($('#'+id).css('left'));
-            });
-            
-        };
-    }
-}
-
-Sum.prototype.setConnectors = function(){
-    
-    jsPlumb.ready(addTarget(this.settings.id,positions.left,'add'));
-    jsPlumb.ready(addTarget(this.settings.id,positions.bottom,'sub'));
-    jsPlumb.ready(addSource(this.settings.id,positions.right));
-    
-    function addSource(id,position,label){
-        return function(){console.log(position);
-            jsPlumb.addEndpoint(id, {
-                endpoint:"Dot",
-                anchor:position,
-                isSource: true,
-                connector: connectorSettings,
-                connectorStyle: connectorPaintStyle,
-                overlays:   [[ "Label", { label:label, id:"label", location:[-0.5, -0.5] } ]],
-                paintStyle:{ fillStyle:"#1e8151",radius:7 },
-                
-            });
-        };
-    }
-    
-     function addTarget(id,position,func){
-        return function(){
-            jsPlumb.addEndpoint(id, {
-                endpoint:"Dot",
-                connectorPaintStyle: connectorPaintStyle,
-                paintStyle:{ 
-                        strokeStyle:"#1e8151",
-                        fillStyle:"transparent",
-                        radius:7,
-                        lineWidth:2 
-                },	
-                anchor:position,
-                isTarget: true,
-                connector: connectorSettings,	
-                parameters:{ 
-                    'func' : func,
-                }
-            });
-        };
-    }
 }

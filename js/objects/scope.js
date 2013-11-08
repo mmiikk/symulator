@@ -1,5 +1,6 @@
 var Scope = function(config){
-    var settings = {
+   
+    var basicConfig = {
         'id' : 'scope',
         'name' : 'scope',
         'type' : 'scope',
@@ -7,65 +8,24 @@ var Scope = function(config){
         'out' : '0',
         'left' : '0',
         'top' : '0',
-
+        'inPos' : [positions.left],
+        'outPos' : [],
+        'inFunc' : [null],
+        'outFunc' : [],
 
     };
-    this.previousValues = [0];
-    this.settings = $.extend({},settings,config);
-   // this.previousValues = $.extend({},previousValues,null);
     
+    this.previousValues = [];
+    
+    this.settings = $.extend({},this.settings,basicConfig);
+    
+    this.settings = $.extend({},this.settings,config);
+    
+    this.endpoints = $.extend([],this.endpoints,[]);
+       
 }
 
-Scope.prototype.outputValue = function(y){
-    console.log(this);
+Scope.prototype = new Block();
+Scope.prototype.outputValue = function(y,h){
     return this.previousValues.push(y);        
-}
-Scope.prototype.outputConfig = function(){
-    return this.settings;        
-}
-Scope.prototype.setJsPlumb = function(){
-    jsPlumb.ready(makeDraggable(this.settings.id));
-    $(document).ready(clickable(this.settings.id));
-    function makeDraggable(id){
-        return function(){
-            jsPlumb.draggable(id);
-        };
-    }
-}
-Scope.prototype.updatePosition = function(){
-    $('#'+this.settings.id).css('top',this.settings.top);
-    $('#'+this.settings.id).css('left',this.settings.left);
-    
-   $(document).ready(updatePosition(this.settings.id,this.settings));
-   
-    function updatePosition(id,set){
-        return function(){
-            $( '#'+id).on( "drag", function( event, ui ) {
-                set.top = parseInt($('#'+id).css('top'));
-                set.left = parseInt($('#'+id).css('left'));
-            });
-            
-        };
-    }
-}
-
-Scope.prototype.setConnectors = function(){
-    jsPlumb.ready(addInPoint(this.settings.id));
-    
-    function addInPoint(id){
-        return function(){
-            jsPlumb.addEndpoint(id, {
-                endpoint:"Dot",
-                paintStyle:{ 
-                        strokeStyle:"#1e8151",
-                        fillStyle:"transparent",
-                        radius:7,
-                        lineWidth:2 
-                },	
-                anchor:[ 0, 0.5, -1, 0 ],
-                isTarget: true,
-                connector: connectorSettings,	
-            });
-        };
-    }
 }

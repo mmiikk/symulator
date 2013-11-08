@@ -1,5 +1,5 @@
 var Feedback = function(config){
-    var settings = {
+    var basicConfig = {
         'id' : 'feedback',
         'name' : 'feedback',
         'type' : 'feedback',
@@ -7,83 +7,24 @@ var Feedback = function(config){
         'out' : '2',
         'left' : '0',
         'top' : '0',
-
+        'inPos' : [positions.left],
+        'outPos' : [positions.right,positions.bottom],
+        'inFunc' : [null],
+        'outFunc' : [null,null],
 
     };
-    this.settings = $.extend({},settings,config);
+    this.previousValues = 0;
+    this.settings = $.extend({},this.settings,basicConfig);
     
-    var previousValues = 0;
+    this.settings = $.extend({},this.settings,config);
+    this.endpoints = $.extend([],this.endpoints,[]);
+    
 }
 
+Feedback.prototype = new Block();
 Feedback.prototype.outputValue = function(){
     return this.previousValues;        
 }
 Feedback.prototype.updatePreviousValues = function(value){
     this.previousValues = value;
-}
-Feedback.prototype.outputConfig = function(){
-    return this.settings;        
-}
-Feedback.prototype.setJsPlumb = function(){
-    jsPlumb.ready(makeDraggable(this.settings.id));
-    $(document).ready(clickable(this.settings.id));
-    function makeDraggable(id){
-        return function(){
-            jsPlumb.draggable(id);
-        };
-    }
-}
-Feedback.prototype.updatePosition = function(){
-    $('#'+this.settings.id).css('top',this.settings.top);
-    $('#'+this.settings.id).css('left',this.settings.left);
-    
-    $(document).ready(updatePosition(this.settings.id,this.settings));
-   
-    function updatePosition(id,set){
-        return function(){
-            $( '#'+id).on( "drag", function( event, ui ) {
-                set.top = parseInt($('#'+id).css('top'));
-                set.left = parseInt($('#'+id).css('left'));
-            });
-            
-        };
-    }
-}
-
-Feedback.prototype.setConnectors = function(){
-    
-    jsPlumb.ready(addTarget(this.settings.id,positions.left));
-    jsPlumb.ready(addSource(this.settings.id,positions.bottom));
-    jsPlumb.ready(addSource(this.settings.id,positions.right));
-    
-    function addSource(id,position){
-        return function(){console.log(position);
-            jsPlumb.addEndpoint(id, {
-                endpoint:"Dot",
-                anchor:position,
-                isSource: true,
-                connector: connectorSettings,
-                connectorStyle: connectorPaintStyle,
-                paintStyle:{ fillStyle:"#1e8151",radius:7 },
-            });
-        };
-    }
-    
-     function addTarget(id,position){
-        return function(){
-            jsPlumb.addEndpoint(id, {
-                endpoint:"Dot",
-                anchor:position,
-                paintStyle:{ 
-                        strokeStyle:"#1e8151",
-                        fillStyle:"transparent",
-                        radius:7,
-                        lineWidth:2 
-                },	
-                isTarget: true,
-                connectorPaintStyle: connectorPaintStyle,
-                connector: connectorSettings,	
-            });
-        };
-    }
 }

@@ -1,4 +1,4 @@
-var Block = function(config){
+var Block = function(){
     var settings = {
         'id' : 'block',
         'name' : 'block',
@@ -8,11 +8,13 @@ var Block = function(config){
         'left' : '0',
         'top' : '0',
         'inPos' : [],
-        'outPos' : []
-
+        'outPos' : [positions.right],
+        'inFunc' : [],
+        'outFunc' : [null],
     };
    
-    this.settings = $.extend({},settings,config);
+    this.settings = settings;
+    this.endpoints = [];
         
 }
 
@@ -47,35 +49,52 @@ Block.prototype.updatePosition = function(){
 
 Block.prototype.setConnectors = function(){
     
-    jsPlumb.ready(addInPoint(this.settings.id));
+    for(var i=0;i<this.settings.in;i++)
+        jsPlumb.ready(addTarget(this.settings.id,this.settings.inPos[i],this.settings.inFunc[i],this.endpoints));
     
-     function addInPoint(id){
+    for(var i=0;i<this.settings.out;i++)
+        jsPlumb.ready(addSource(this.settings.id,this.settings.outPos[i],this.settings.outFunc[i],this.endpoints));
+    
+      console.log(this.endpoints)
+     function addSource(id,position,label,endpoints){
+            console.log(endpoints)
         return function(){
-            jsPlumb.addEndpoint(id, {
+            var endPoint = jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
-                connectorStyle: connectorPaintStyle,
-                paintStyle:{ fillStyle:"#1e8151",radius:7 },
-                anchor:positions.right,
+                anchor:position,
                 isSource: true,
-                connector: connectorSettings,	
+                connector: connectorSettings,
+                connectorStyle: connectorPaintStyle,
+                overlays:   [[ "Label", { label:label, id:"label", location:[-0.5, -0.5] } ]],
+                paintStyle:{ fillStyle:"#1e8151",radius:7 },
+                uuid : id,
+                
             });
+            endpoints.push(endPoint);
         };
-    }
+     }
     
-     function addOutPoint(id){
+     function addTarget(id,position,func,endpoints){
+         
         return function(){
-            jsPlumb.addEndpoint(id, {
+            
+            var endPoint = jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
+                connectorPaintStyle: connectorPaintStyle,
                 paintStyle:{ 
                         strokeStyle:"#1e8151",
                         fillStyle:"transparent",
                         radius:7,
                         lineWidth:2 
-                },
-                anchor:[ 0, 0.4, -1, 0 ],
+                },	
+                anchor:position,
                 isTarget: true,
                 connector: connectorSettings,	
+                parameters:{ 
+                    'func' : func,
+                }
             });
+            endpoints.push(endPoint);
         };
     }
 }

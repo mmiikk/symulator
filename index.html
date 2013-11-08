@@ -14,7 +14,7 @@
     <script src="lib/jquery.jsPlumb-1.5.2-min.js"></script>
     <script src="lib/jquery.flot.min.js"></script>
 
-    <script src="lib/jquery-ui-1.10.3.custom.js"></script>
+    <script src="lib/jquery-ui-1.10.3.custom.min.js"></script>
     <script src="lib/underscore.js"></script>
     <script src="js/index.js"></script>
         
@@ -33,7 +33,7 @@
 <body>
     <div data-role="page" id="main">
         <!-- Left side panel contain functions etc step, integrator, etc... -->
-        <div data-role="panel" id="toolbox" ng-controller="Toolbox">
+        <div data-role="panel" id="toolbox" ng-controller="Toolbox" >
            <div class="spacer" ng-repeat="tool in tools">
                <div id="{{tool.id}}" class="block {{tool.type}}">
                    <span class="blockImage">
@@ -53,7 +53,7 @@
             <a href="#" data-role="button" data-icon="check" data-iconpos="notext" data-theme="a" data-inline="true" id="run"></a>
             <div data-role="navbar" data-iconpos="bottom">
 		<ul>
-			<li><button data-icon="deleted" id="remove" class="ui-disabled" data-role="button" >Usun</button></li>
+		<!--	<li><button data-icon="deleted" id="remove" class="ui-disabled" data-role="button" >Usun</button></li>-->
                         <li><button data-icon="deleted" id="build" data-role="button" >Usun</button></li>
 		</ul>
             </div><!-- /navbar -->
@@ -76,9 +76,40 @@
                 </div>
             </div>
             <div id="plot"></div>
+            
+        </div>
+        
+        <div data-role="footer" data-id="footer" id="footer" data-position="fixed" class="ui-bar" >
+            
+		<div data-role="controlgroup" data-type="horizontal">
+                    <a href="#" data-icon="deleted" id="remove" class="ui-disabled">Usun</a>
+                    <a href="#properties" data-rel="dialog" id="propertiesbtn" data-transition="pop">Opcje</a>
+                   
+                </div>
+            
+        </div><!-- /footer -->
+    
+    </div>
+     
+    <div id="properties" data-role="dialog" data-position-to="window">
+        <div data-role="header">
+            <h1>My Dialog</h1>
+        </div>
+
+        <div data-role="content" ng-controller="Properties">        
+            <form>
+                <div ng-repeat="property in properties">
+                    <input ng-repeat type="{{property.properties.type}}" >
+                    
+                </div>
+                
+            </form>
+                
         </div>
     </div>
-        
+    
+    
+    
         
 </body>
 </html>

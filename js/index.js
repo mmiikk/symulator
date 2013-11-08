@@ -35,6 +35,7 @@ function Toolbox($scope){
      
 }
 
+
 $(document).ready(function(){
    $('#run').click(function(){
       $().solver('init',[jsPlumb.getAllConnections(),angular.element('[ng-controller=Page]').scope().objects]);   
@@ -88,6 +89,8 @@ function Page($scope){
            'name':name,
            'type':type[0].type,
         });
+        
+                
         $scope.$apply();
     }
     
@@ -110,6 +113,10 @@ function Page($scope){
             if (object.settings.id!==id) $scope.objects.push(object);
           });
         //console.log($scope.objects);
+    }
+    
+    $scope.getEveryEndpoint = function(id){
+        return _.filter($scope.objects,function(obj){return obj.settings.id===id;});        
     }
     
     $scope.addObject = function(position, toolboxWidth, id){
@@ -157,13 +164,15 @@ function Page($scope){
        
         
         $scope.objects.push( block ) ;
-        console.log($scope.objects);
+        
         $scope.$apply();
         
         block.setJsPlumb();
-        console.log('a');
-        block.updatePosition(); console.log('a');
+       
+        block.updatePosition(); 
         block.setConnectors();
+        
+       
             
                 
     }
@@ -186,6 +195,18 @@ function Page($scope){
     
 }
 
+function Properties($scope){
+    $scope.properties = [];
+    
+    $scope.addObject = function(obj)
+    {
+        $scope.properties.push(obj);
+    }
+
+}
+
+
+
 jsPlumb.ready(function(){
    jsPlumb.Defaults.ConnectionOverlays =[ ["Arrow", { location:1 } ] ]; 
    jsPlumb.Defaults.Connector = [ "Flowchart", { stub:[40, 60], gap:1, cornerRadius:5, alwaysRespectStubs:true } ];		
@@ -194,8 +215,8 @@ jsPlumb.ready(function(){
 var connectorSettings = [ "Flowchart", { stub:[100, 100], gap:1, cornerRadius:5, alwaysRespectStubs:false, midPoint: 1 } ];
 
 var positions = {
-  left: [ 0, 0.4, -1, 0 ],
-  right:  [ 1, 0.4, 1, 0 ],
+  left: [ 0, 0.5, -1, 0 ],
+  right:  [ 1, 0.5, 1, 0 ],
   top:   [ 0.5, 0 , -0.5, 0],
   bottom:   [ 0.5, 1 , 0, 1],
 };
@@ -211,48 +232,61 @@ var connectorPaintStyle = {
 function clickable(selector){
     return function(){
         var obj = $('#page').find('#'+selector);
-            obj.click(function(){
+           obj.click(function(){
                
                 if(obj.hasClass('clicked'))
                     {
                         obj.removeClass('clicked');
-                        $('#remove').addClass('ui-disabled');
+                        if( $('#page').find('.clicked').length === 0 )
+                        {
+                            $('#remove').addClass('ui-disabled');
+                            $('#propertiesbtn').addClass('ui-disabled');
+                        }
                     }
                 else
                     {
                         obj.addClass('clicked');
-                        $('#remove').removeClass('ui-disabled');
+                        if( $('#page').find('.clicked').length !== 0 )
+                            $('#remove').removeClass('ui-disabled');
+                        
                     }
-                
-                
+                         
             });
         
     };
 }
 
 $(document).ready(function(){
+    
+  
    $('#remove').bind('click',function(event,ui){
        
        console.log($('#page').find('.clicked'));
        var toDelete = $('#page').find('.clicked');
-       console.log(jsPlumb);
+       var endpoints = [];
+ 
        for(var i=0; i< toDelete.length; i++)
            {
+               endpoints = angular.element('[ng-controller=Page]').scope().getEveryEndpoint(toDelete[i].id);
                angular.element('[ng-controller=Page]').scope().removeObject(toDelete[i].id);
-               jsPlumb.deleteEveryEndpoint(toDelete[i]);
+               
+               for(var j=0; j< endpoints[0].endpoints.length; j++)
+                    jsPlumb.deleteEndpoint(endpoints[0].endpoints[j]);
                jsPlumb.detachAllConnections(toDelete[i]);
                
 
                $(toDelete[i]).remove();
            }
        $(this).addClass('ui-disabled');
-      // $('.ui-btn-active').removeClass('ui-btn-active');
+
    });
+   
+   
    
    $('#build').bind('click',function(event,ui){
         angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'step'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'sum'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+      //  angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'sum'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
        // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
        // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
@@ -264,7 +298,11 @@ $(document).ready(function(){
 //
 //
 //
+//
         //jsPlumb.connect({source:'step0',target:'sum1'});
+       
+       jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getEveryEndpoint('step0')[0].endpoints[0],target:angular.element('[ng-controller=Page]').scope().getEveryEndpoint('scope6')[0].endpoints[0]});
+        
 
 /*
  * 

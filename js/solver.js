@@ -210,9 +210,10 @@
             
                 var  y = 0 ;
                 var time = 0;
+                var h=0.1;
                 //var
                 console.time('someFunction timer');
-                while(time<50)
+                while(time<10)
                     {
                      console.log('####');
                       console.log('####');
@@ -225,17 +226,17 @@
                                     {
                                         if(j!==parseInt(Order[i].length-1))
                                             {
-                                        console.log(Order[i][j][0]);
+                                       // console.log(Order[i][j][0]);
                                         var obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].sourceId});
-                                        console.log(obje);
+                                       // console.log(obje);
                                          //   if(obje[0].settings.type =='feedback')
                                             
-                                        y=obje[0].outputValue(y,0.1);
+                                        y=obje[0].outputValue(y,h,time);
                                         console.log(y);
                                         var tar =  _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
                                                     if(tar[0].settings.type==='sum')
                                                         {
-                                                            console.log(Order[i][j][0].sourceIdParam);
+                                                            //console.log(Order[i][j][0].sourceIdParam);
                                                             tar[0].updatePreviousValues(Order[i][j][0].sourceIdParam,y);
                                                         }
                                                         else if (tar[0].settings.type==='feedback')
@@ -243,15 +244,15 @@
                                         }
                                        else
                                            {
-                                               console.log(Order[i][j][0]);
+                                              // console.log(Order[i][j][0]);
                                                var obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].sourceId});
-                                               console.log(obje);
-                                               y=obje[0].outputValue(y,0.1);
+                                              // console.log(obje);
+                                               y=obje[0].outputValue(y,h,time);
                                                console.log(y);
                                                var tar =  _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
                                                     if(tar[0].settings.type==='sum')
                                                         {
-                                                            console.log(Order[i][j][0].sourceIdParam);
+                                                         //   console.log(Order[i][j][0].sourceIdParam);
                                                             tar[0].updatePreviousValues(Order[i][j][0].sourceIdParam,y);
                                                         }
                                                         else if (tar[0].settings.type==='feedback')
@@ -259,8 +260,8 @@
                                                         else
                                                             {
                                                var obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
-                                               console.log(obje);
-                                               obje[0].outputValue(y,0.1);
+                                             //  console.log(obje);
+                                               obje[0].outputValue(y,h,time);
                                                             }
                                            }
                                         

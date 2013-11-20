@@ -8,7 +8,7 @@ var Scope = function(config){
         'out' : '0',
         'left' : '0',
         'top' : '0',
-        'inPos' : [positions.left],
+        'inPos' : [{'position':positions.left}],
         'outPos' : [],
         'inFunc' : [null],
         'outFunc' : [],

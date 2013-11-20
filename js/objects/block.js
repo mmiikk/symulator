@@ -8,7 +8,7 @@ var Block = function(){
         'left' : '0',
         'top' : '0',
         'inPos' : [],
-        'outPos' : [positions.right],
+        'outPos' : [{'position':positions.right}],
         'inFunc' : [],
         'outFunc' : [null],
     };
@@ -16,6 +16,15 @@ var Block = function(){
     this.settings = settings;
     this.endpoints = [];
         
+}
+
+Block.prototype.updateParameters = function(){
+    
+    for(var i=0;i<this.parameters.length;i++)
+    {
+       this.parameters[i].value = this.previousValues[this.parameters[i].id];
+    }
+   
 }
 
 Block.prototype.outputConfig = function(){
@@ -55,19 +64,19 @@ Block.prototype.setConnectors = function(){
     for(var i=0;i<this.settings.out;i++)
         jsPlumb.ready(addSource(this.settings.id,this.settings.outPos[i],this.settings.outFunc[i],this.endpoints));
     
-      console.log(this.endpoints)
-     function addSource(id,position,label,endpoints){
-            console.log(endpoints)
+     
+    function addSource(id,position,label,endpoints){
+          
         return function(){
             var endPoint = jsPlumb.addEndpoint(id, {
                 endpoint:"Dot",
-                anchor:position,
+                anchor:position.position,
                 isSource: true,
                 connector: connectorSettings,
                 connectorStyle: connectorPaintStyle,
                 overlays:   [[ "Label", { label:label, id:"label", location:[-0.5, -0.5] } ]],
                 paintStyle:{ fillStyle:"#1e8151",radius:7 },
-                uuid : id,
+               
                 
             });
             endpoints.push(endPoint);
@@ -87,12 +96,13 @@ Block.prototype.setConnectors = function(){
                         radius:7,
                         lineWidth:2 
                 },	
-                anchor:position,
+                anchor:position.position,
                 isTarget: true,
                 connector: connectorSettings,	
                 parameters:{ 
-                    'func' : func,
-                }
+                    'func' : position.func,
+                },
+                overlays:   [[ "Label", { label:position.func, id:"label", location:[2, 0.5] } ]],
             });
             endpoints.push(endPoint);
         };

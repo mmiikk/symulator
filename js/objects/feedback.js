@@ -7,8 +7,8 @@ var Feedback = function(config){
         'out' : '2',
         'left' : '0',
         'top' : '0',
-        'inPos' : [positions.left],
-        'outPos' : [positions.right,positions.bottom],
+        'inPos' : [{'position':positions.left}],
+        'outPos' : [{'position':positions.right},{'position':positions.bottom}],
         'inFunc' : [null],
         'outFunc' : [null,null],
 

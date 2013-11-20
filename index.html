@@ -1,6 +1,6 @@
 <html ng-app>
 <head >
-    <meta charset="utf-8">
+    <meta charset="iso-8859-2">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title></title>
     <meta name="description" content="">
@@ -83,7 +83,7 @@
             
 		<div data-role="controlgroup" data-type="horizontal">
                     <a href="#" data-icon="deleted" id="remove" class="ui-disabled">Usun</a>
-                    <a href="#properties" data-rel="dialog" id="propertiesbtn" data-transition="pop">Opcje</a>
+                    <a href="#properties" data-rel="dialog" id="propertiesbtn" data-transition="pop" class="ui-disabled">Opcje</a>
                    
                 </div>
             
@@ -96,14 +96,26 @@
             <h1>My Dialog</h1>
         </div>
 
-        <div data-role="content" ng-controller="Properties">        
-            <form>
-                <div ng-repeat="property in properties">
-                    <input ng-repeat type="{{property.properties.type}}" >
-                    
-                </div>
-                
+        <div data-role="content" ng-controller="Form" >        
+            
+            <!--<div ng-repeat="property in properties">
+                <form ng-repeat="parameter in property.parameters" >
+                   <input type="range" max="1" min="0" />
+
+                    <input class="inputelm" type="{{parameter.type}}" min="0" max="10" name="a" id="{{parameter.id}}" />
+                    {{parameter.type}}
+
+                </form>
+                <button ng-click="clik()" />
+            </div>-->
+           
+            
+            <form id="propertiesForm2" >
+                <input ng-repeat="input in inputs" type="{{input.type}}" min="0" max="10" value="{{input.value}}" id="{{input.id}}" data-input-name="{{input.id}}">
+               
+                <a href="#" data-rel="back" data-role="button" ng-click="submit()">Zapisz</a>
             </form>
+            
                 
         </div>
     </div>

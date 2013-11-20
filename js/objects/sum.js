@@ -7,51 +7,108 @@ var Sum = function(config){
         'out' : '1',
         'left' : '0',
         'top' : '0',
-        'inPos' : [positions.left,positions.bottom,positions.top],
-        'outPos' : [positions.right],
-        'inFunc' : ['add','sub','sub'],
-        'outFunc' : [null],
+        'inPos' : [{'position':positions.left, 'func':'add'},
+                    {'position':positions.bottom, 'func':'sub'},
+                    {'position':positions.top, 'func':'sub'}],
+        'outPos' : [{'position':positions.right}],
+        
 
     };
     
-    updateFunc(basicConfig.inFunc);
+    updateFunc(basicConfig.inPos);
     
     this.settings = $.extend({},this.settings,basicConfig);
     
     this.settings = $.extend({},this.settings,config);
-    this.previousValues = buildPreviousValuesObject(basicConfig.inFunc);
+    this.previousValues = buildPreviousValuesObject(basicConfig.inPos);
     this.endpoints = $.extend([],this.endpoints,[]);
+   
+     console.log(this.endpoints);
+
+  
+    this.parameters = [
+        {   
+            'type' : 'textPositionsIn',
+            'label' : '',
+            'value' : [positions.left,positions.bottom,positions.top],
+            'id' : 'textPositionsIn',
+            'func' : ['add','sub','sub'],
+            'positionsLabel' : ['Prawo','Lewo','Dó³','Góra'],
+        },
+       /* {   
+            'type' : 'controlgroup',
+            'label' : '',
+            'value' : [positions.right],
+            'id' : 'subCheckbox',
+            'positions' : [positions.right,positions.left,positions.bottom,positions.top],
+            'positionsLabel' : ['Prawo','Lewo','Dó³','Góra'],
+        },*/
+        
+        
+       
+    ];
    
     this.outputValue();
     
-    function updateFunc(functions){
-        for(var i=0;i<functions.length;i++)
-        {
-            functions[i]=functions[i]+i;
-        }
-    }
-    function buildPreviousValuesObject(functions)
-    {
-        var prevVal = {};
-        for(var i=0;i<functions.length;i++)
-        {
-            prevVal[functions[i]]=0;
-        }
-        return prevVal;
-    }
+    
+    //function buildParameters
+    
+   
 }
 
+function updateFunc(functions){
+        for(var i=0;i<functions.length;i++)
+        {
+            functions[i].func=functions[i].func+i;
+        }
+}
+ function buildPreviousValuesObject(functions)
+{
+    var prevVal = {};
+    for(var i=0;i<functions.length;i++)
+    {
+        prevVal[functions[i].func]=0;
+    }
+    return prevVal;
+}
 Sum.prototype = new Block();
+Sum.prototype.updateParameters = function(){
+   console.log(this.parameters);
+    
+  
+   this.settings.inPos.length = 0;
+   
+   for(var i=0; i< this.parameters[0].value.length; i++) 
+       this.settings.inPos.push({'position':this.parameters[0].value[i],'func':this.parameters[0].func[i]});
+   
+   updateFunc(this.settings.inPos);
+   
+   console.log(this.settings);
+   
+   this.settings.in = this.parameters[0].value.length;
+   this.previousValues = buildPreviousValuesObject(this.settings.inPos);
+   
+   console.log(this.endpoints);
+   for(var j=0; j< this.endpoints.length; j++)
+       jsPlumb.deleteEndpoint(this.endpoints[j]);
+   
+   this.endpoints.length = 0;
+   console.log(this.settings);
+  // this.setConnectors();
+ //  this.updatePosition();
+   
+}
 Sum.prototype.outputValue = function(){
     var outVal = 0;
-    
-    for(var i=0;i<this.settings.inFunc.length;i++)
+       console.log(this.endpoints);
+
+    for(var i=0;i<this.settings.inPos.length;i++)
     {
         
-        if(this.settings.inFunc[i].indexOf('add') === -1)
-            outVal = parseFloat( outVal - this.previousValues[this.settings.inFunc[i]] );
+        if(this.settings.inPos[i].func.indexOf('add') === -1)
+            outVal = parseFloat( outVal - this.previousValues[this.settings.inPos[i].func] );
         else
-           outVal = parseFloat( outVal + this.previousValues[this.settings.inFunc[i]] );
+           outVal = parseFloat( outVal + this.previousValues[this.settings.inPos[i].func] );
     }
     //console.log(outVal);
     return outVal;

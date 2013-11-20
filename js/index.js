@@ -36,6 +36,9 @@ function Toolbox($scope){
 }
 
 
+
+
+
 $(document).ready(function(){
    $('#run').click(function(){
       $().solver('init',[jsPlumb.getAllConnections(),angular.element('[ng-controller=Page]').scope().objects]);   
@@ -81,7 +84,6 @@ function Page($scope){
     ];
     
     $scope.temps = [];
-
     $scope.addTemp = function(name){
         var type = _.filter(angular.element('[ng-controller=Toolbox]').scope().tools,function(obj){ return obj.id == name});
         
@@ -115,7 +117,7 @@ function Page($scope){
         //console.log($scope.objects);
     }
     
-    $scope.getEveryEndpoint = function(id){
+    $scope.getObject = function(id){
         return _.filter($scope.objects,function(obj){return obj.settings.id===id;});        
     }
     
@@ -183,7 +185,42 @@ function Page($scope){
         $('#'+getLastID()).css({'top':top,'left':left});
         
     }
-   
+    
+    
+    $scope.updateScope = function(id, parameters)
+    {
+        //$scope.$watch();
+        console.log(parameters);
+        console.log(id);
+        angular.forEach($scope.objects, function(object) {
+           
+            if (object.settings.id===id) {
+                console.log(object);
+                console.log(parameters);
+                if(object.settings.type!=='sum')
+                {
+                    object.previousValues = parameters;
+                    
+                }
+                else
+                {
+                    console.log(object.parameters[0]);
+                   object.parameters[0] = $.extend({},object.parameters[0],parameters);
+                }
+                console.log(object);
+               
+                object.updateParameters();
+                
+            }
+        });
+        
+        $scope.$apply();
+        console.log($scope.objects);
+        
+    }
+    
+  
+  
     function getMaxID(){
         return ($scope.objects.length);
     }
@@ -195,15 +232,112 @@ function Page($scope){
     
 }
 
-function Properties($scope){
-    $scope.properties = [];
-    
-    $scope.addObject = function(obj)
-    {
-        $scope.properties.push(obj);
-    }
 
+
+function changeStringToArray(string){
+   
+        var s = string.split(',',4);
+        s = s.map(function(e) { return parseFloat(e) });
+       
+        return positions[findPositionByValue(s)];
 }
+
+function Form($scope){
+    $scope.inputs = [];
+    
+    $scope.addInput = function(type,parameter) {
+        $scope.inputs.push({type:type,value:parameter.value,id:'I'+parameter.id});
+        $scope.$apply();
+        
+    }
+    
+    $scope.submit = function()
+    {
+        console.log('a');
+        var parameters = {};
+        var subparameters = {'func':[],'value':[],};
+        var objectToReplaceId = $('#propertiesForm2').attr('data-id');
+        
+        $('#propertiesForm2 :input').each(function(){
+            //console.log($(this));
+            if( $(this).attr('type') !== 'submit')
+            {
+                console.log($(this).attr('type'));
+                console.log($(this).attr('data-input-name'));
+                if( $(this).attr('type') === 'text' && $(this).attr('data-input-name') === 'ItextPositionsIn')
+                {
+                    if($(this).val()!=='')
+                    {
+                        var func = '';
+                        var positionsInOrder = [];
+                        var step = 0;
+                        
+                        
+                        for(var key in positions) {
+                            positionsInOrder.push(positions[key]);                          
+                        }
+                        switch ($(this).val().length){
+                            case 1:
+                                step = 8;
+                                break;
+                            case 2:
+                                step = 4;
+                                break;
+                            case 3: 
+                                step = 2;
+                                break;
+                            default:
+                                step = 2;
+                                break;
+                            }
+                        
+                        for(var i = 0 ; i < $(this).val().length ; i++){
+                            if($(this).val().substring(i,i+1)==='+')
+                                subparameters.func.push('add');
+                            else if ($(this).val().substring(i,i+1)==='-')
+                                subparameters.func.push('sub');
+                        }
+                            console.log(subparameters);
+                            console.log($(this).val().length);
+                            console.log(positionsInOrder.length);
+                        for(var i = 0 ; i < 5 ; i=i+step){
+                            subparameters.value.push(positionsInOrder[i]);
+                             console.log(positionsInOrder[i]);
+                        }
+                        if ($(this).val().length > 3 ){
+                            var j = 1;
+                            for(var i = 3 ; i < $(this).val().length ; i++){
+                                subparameters.value.push(positionsInOrder[j]);
+                                j = j+2;
+                            }
+                        }
+                   
+                    }
+                       
+                    //console.log($(this));
+                    //$('.ui-dialog').dialog('close');
+                }
+                else if( $(this).attr('type') !== 'checkbox' )
+                    parameters[$(this).attr('id')]=$(this).val();
+                
+                
+            }
+          
+        });
+        console.log(subparameters);
+        if(subparameters.func.length > 0)
+            parameters = $.extend({}, parameters, subparameters);
+        
+        console.log(parameters);
+        $scope.inputs = [];
+        $scope.$apply();
+        angular.element('[ng-controller=Page]').scope().updateScope(objectToReplaceId, parameters);
+        $('.ui-dialog').dialog('close');
+       // $('.ui-dialog').dialog('close');
+    }
+    
+}
+
 
 
 
@@ -215,11 +349,32 @@ jsPlumb.ready(function(){
 var connectorSettings = [ "Flowchart", { stub:[100, 100], gap:1, cornerRadius:5, alwaysRespectStubs:false, midPoint: 1 } ];
 
 var positions = {
+  
   left: [ 0, 0.5, -1, 0 ],
-  right:  [ 1, 0.5, 1, 0 ],
+  leftBottom: [ 0.15, 0.85, 1, 0 ],
   top:   [ 0.5, 0 , -0.5, 0],
+  leftTop: [ 0.15, 0.15, -1, 0 ],
   bottom:   [ 0.5, 1 , 0, 1],
+  rightBottom: [ 0.85, 0.85, -1, 0 ],
+  right:  [ 1, 0.5, 1, 0 ],
+  rightTop: [ 0.85, 0.15, -1, 0 ],
+  
+  
+  
 };
+
+function findPositionByValue(val)
+{
+   
+           
+    for(var key in positions) {
+        if(_.isEqual(val, positions[key]))
+        {
+            return key;
+        }
+    }
+    return false;
+}
 
 var connectorPaintStyle = {
 				lineWidth:4,
@@ -233,21 +388,40 @@ function clickable(selector){
     return function(){
         var obj = $('#page').find('#'+selector);
            obj.click(function(){
-               
+              console.log('c');
                 if(obj.hasClass('clicked'))
                     {
                         obj.removeClass('clicked');
+                        
                         if( $('#page').find('.clicked').length === 0 )
-                        {
                             $('#remove').addClass('ui-disabled');
-                            $('#propertiesbtn').addClass('ui-disabled');
+                           
+                        if( $('#page').find('.clicked').length === 1)
+                        {
+                            $('#propertiesbtn').removeClass('ui-disabled');
+                             console.log('b');
+                           // buildProperties();
                         }
+                        else
+                            $('#propertiesbtn').addClass('ui-disabled');
                     }
                 else
                     {
                         obj.addClass('clicked');
                         if( $('#page').find('.clicked').length !== 0 )
+                        {
                             $('#remove').removeClass('ui-disabled');
+                            if( $('#page').find('.clicked').length === 1)
+                            {
+                                $('#propertiesbtn').removeClass('ui-disabled');
+                                console.log('a');
+                               // buildProperties();
+                                console.log('a');
+                            }
+                            else
+                                $('#propertiesbtn').addClass('ui-disabled');
+                                    
+                        }
                         
                     }
                          
@@ -256,8 +430,39 @@ function clickable(selector){
     };
 }
 
+function buildProperties()
+{
+      var element = $('#page').find('.clicked');
+       console.log(element);
+         
+       var a = angular.element('[ng-controller=Page]').scope().getObject(element.attr('id'));
+       angular.element('[ng-controller=Properties]').scope().addObject(a[0]);
+       
+       var a = $('#properties').find(':input');
+}
+
+
 $(document).ready(function(){
-    
+    // Dialog opened 
+    $('#properties').on("pageshow", function() {
+        
+        
+        
+       // console.log(angular.element('[ng-controller=Form]').scope());
+        $('#propertiesForm2').trigger('create');
+    });
+
+    // Dialog closed 
+    $('#properties').on("pagehide", function() {
+        //console.log(angular.element('[ng-controller=Page]').scope());
+        //
+        //alert("Closed");
+       var blockId = $('#page').find('.clicked').attr('id');
+       var obj = angular.element('[ng-controller=Page]').scope().getObject(blockId);
+       if(obj[0].settings.type==='sum')
+       obj[0].setConnectors();
+    });
+
   
    $('#remove').bind('click',function(event,ui){
        
@@ -267,7 +472,7 @@ $(document).ready(function(){
  
        for(var i=0; i< toDelete.length; i++)
            {
-               endpoints = angular.element('[ng-controller=Page]').scope().getEveryEndpoint(toDelete[i].id);
+               endpoints = angular.element('[ng-controller=Page]').scope().getObject(toDelete[i].id);
                angular.element('[ng-controller=Page]').scope().removeObject(toDelete[i].id);
                
                for(var j=0; j< endpoints[0].endpoints.length; j++)
@@ -281,6 +486,72 @@ $(document).ready(function(){
 
    });
    
+ 
+   $('#propertiesbtn').bind('click',function(event,ui){
+       var blockId = $('#page').find('.clicked').attr('id');
+       var obj = angular.element('[ng-controller=Page]').scope().getObject(blockId);
+       
+       
+       
+       var parameter = null;
+       for(var i=0;i<obj[0].parameters.length;i++)
+       {
+           parameter = obj[0].parameters[i];
+           console.log(obj);
+           $('#propertiesForm2').append('<label for="'+ parameter.id+'">'+ parameter.label+'</label>');
+           if( parameter.type === 'range')
+               angular.element('[ng-controller=Form]').scope().addInput('range',parameter);
+               
+           
+           if( parameter.type === 'textPositionsIn')
+           {
+               var func = '';
+               var index = -1;
+               var i=1;
+               var inputs = '';
+               
+               for(var key in positions) {
+                                    
+                   index = parameter.value.indexOf(positions[key]);
+                   
+                   if(index !== -1)
+                   {
+                       func = parameter.func[index];
+                       if (func === 'add')
+                           inputs += '+';
+                       else if (func === 'sub')
+                           inputs += '-';
+                       //inputs += func;
+                   }
+                   else
+                   {
+                       func = '';
+                       //inputs += '0';
+                   }
+                   
+                   
+                 
+                   
+               }
+              
+              
+               parameter.value = inputs;
+               
+               console.log(parameter);
+               angular.element('[ng-controller=Form]').scope().addInput('text',parameter);
+             
+           }
+         
+           
+           
+       }
+      
+       $('#propertiesForm2').attr('data-id',blockId);
+       
+      
+       $("#propertiesForm2").trigger('create');
+       
+   });
    
    
    $('#build').bind('click',function(event,ui){
@@ -301,7 +572,7 @@ $(document).ready(function(){
 //
         //jsPlumb.connect({source:'step0',target:'sum1'});
        
-       jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getEveryEndpoint('step0')[0].endpoints[0],target:angular.element('[ng-controller=Page]').scope().getEveryEndpoint('scope6')[0].endpoints[0]});
+       jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('step0')[0].endpoints[0],target:angular.element('[ng-controller=Page]').scope().getObject('scope6')[0].endpoints[0]});
         
 
 /*

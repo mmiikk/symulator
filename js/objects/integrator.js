@@ -7,8 +7,8 @@ var Integrator = function(config){
         'out' : '1',
         'left' : '0',
         'top' : '0',
-        'inPos' : [positions.left],
-        'outPos' : [positions.right],
+        'inPos' : [{'position':positions.left}],
+        'outPos' : [{'position':positions.right}],
         'inFunc' : [null],
         'outFunc' : [null],
 

@@ -30,6 +30,18 @@ function Toolbox($scope){
             'type':'feedback',
                
         },
+         {
+            'id':'constant',
+            'name':'constant',
+            'type':'constant',
+               
+        },
+         {
+            'id':'gain',
+            'name':'gain',
+            'type':'gain',
+               
+        },
        
     ];
      
@@ -160,6 +172,20 @@ function Page($scope){
                                  'top':position.top,
                     });
                 break;
+            case 'constant':
+                    var block = new Constant({'id':id+getMaxID(),
+                                 'name':id + ' ' + getMaxID(),
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
+                                 'top':position.top,
+                    });
+                break;
+            case 'gain':
+                    var block = new Gain({'id':id+getMaxID(),
+                                 'name':id + ' ' + getMaxID(),
+                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
+                                 'top':position.top,
+                    });
+                break;
            
         }
               
@@ -244,16 +270,21 @@ function changeStringToArray(string){
 
 function Form($scope){
     $scope.inputs = [];
+    $scope.plot = null;
     
     $scope.addInput = function(type,parameter) {
-        $scope.inputs.push({type:type,value:parameter.value,id:'I'+parameter.id});
+        $scope.inputs.push({type:type,value:parameter.value,id:parameter.id});
         $scope.$apply();
         
     }
     
+    $scope.addPlot = function(id){
+        $scope.plot = id;
+        $scope.$apply();
+    }
+    
     $scope.submit = function()
     {
-        console.log('a');
         var parameters = {};
         var subparameters = {'func':[],'value':[],};
         var objectToReplaceId = $('#propertiesForm2').attr('data-id');
@@ -340,29 +371,6 @@ function Form($scope){
 
 
 
-
-jsPlumb.ready(function(){
-   jsPlumb.Defaults.ConnectionOverlays =[ ["Arrow", { location:1 } ] ]; 
-   jsPlumb.Defaults.Connector = [ "Flowchart", { stub:[40, 60], gap:1, cornerRadius:5, alwaysRespectStubs:true } ];		
-});
-
-var connectorSettings = [ "Flowchart", { stub:[100, 100], gap:1, cornerRadius:5, alwaysRespectStubs:false, midPoint: 1 } ];
-
-var positions = {
-  
-  left: [ 0, 0.5, -1, 0 ],
-  leftBottom: [ 0.15, 0.85, 1, 0 ],
-  top:   [ 0.5, 0 , -0.5, 0],
-  leftTop: [ 0.15, 0.15, -1, 0 ],
-  bottom:   [ 0.5, 1 , 0, 1],
-  rightBottom: [ 0.85, 0.85, -1, 0 ],
-  right:  [ 1, 0.5, 1, 0 ],
-  rightTop: [ 0.85, 0.15, -1, 0 ],
-  
-  
-  
-};
-
 function findPositionByValue(val)
 {
    
@@ -376,14 +384,7 @@ function findPositionByValue(val)
     return false;
 }
 
-var connectorPaintStyle = {
-				lineWidth:4,
-				strokeStyle:"#deea18",
-				joinstyle:"round",
-				outlineColor:"#eaedef",
-				outlineWidth:2
-			};
-                        
+
 function clickable(selector){
     return function(){
         var obj = $('#page').find('#'+selector);
@@ -441,7 +442,12 @@ function buildProperties()
        var a = $('#properties').find(':input');
 }
 
-
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+    pom.click();
+}
 $(document).ready(function(){
     // Dialog opened 
     $('#properties').on("pageshow", function() {
@@ -491,7 +497,7 @@ $(document).ready(function(){
        var blockId = $('#page').find('.clicked').attr('id');
        var obj = angular.element('[ng-controller=Page]').scope().getObject(blockId);
        
-       
+      
        
        var parameter = null;
        for(var i=0;i<obj[0].parameters.length;i++)
@@ -528,18 +534,30 @@ $(document).ready(function(){
                        func = '';
                        //inputs += '0';
                    }
-                   
-                   
-                 
-                   
+                            
                }
               
               
                parameter.value = inputs;
                
-               console.log(parameter);
+              
                angular.element('[ng-controller=Form]').scope().addInput('text',parameter);
              
+           }
+           if(parameter.type === 'plot')
+           {
+              
+               $.plot('#plot',[obj[0].previousValues]);
+               var data ='';
+               for(var i=0; i<obj[0].previousValues.length;i++)
+                   data += obj[0].previousValues[i][0]+'\t'+obj[0].previousValues[i][1]+'\r\n';
+               download('test.txt', data);
+             /*  for(i=0;i<f[0].previousValues.length;i++)
+                    {
+                        data.push([i, f[0].previousValues[i]]);
+                        
+                    }
+                $.plot('#plot',[data]);*/
            }
          
            
@@ -571,9 +589,11 @@ $(document).ready(function(){
 //
 //
         //jsPlumb.connect({source:'step0',target:'sum1'});
-       
-       jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('step0')[0].endpoints[0],target:angular.element('[ng-controller=Page]').scope().getObject('scope6')[0].endpoints[0]});
-        
+       console.log(angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints);
+       jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[0],
+           target:angular.element('[ng-controller=Page]').scope().getObject('integrator2')[0].endpoints[0]});
+         jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('integrator2')[0].endpoints[0],
+             target:angular.element('[ng-controller=Page]').scope().getObject('feedback3')[0].endpoints[0]}); 
 
 /*
  * 

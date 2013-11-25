@@ -31,7 +31,7 @@ var Sum = function(config){
             'type' : 'textPositionsIn',
             'label' : '',
             'value' : [positions.left,positions.bottom,positions.top],
-            'id' : 'textPositionsIn',
+            'id' : 'ItextPositionsIn',
             'func' : ['add','sub','sub'],
             'positionsLabel' : ['Prawo','Lewo','Dó³','Góra'],
         },
@@ -73,7 +73,7 @@ function updateFunc(functions){
 }
 Sum.prototype = new Block();
 Sum.prototype.updateParameters = function(){
-   console.log(this.parameters);
+  
     
   
    this.settings.inPos.length = 0;
@@ -83,24 +83,24 @@ Sum.prototype.updateParameters = function(){
    
    updateFunc(this.settings.inPos);
    
-   console.log(this.settings);
+   
    
    this.settings.in = this.parameters[0].value.length;
    this.previousValues = buildPreviousValuesObject(this.settings.inPos);
    
-   console.log(this.endpoints);
+  
    for(var j=0; j< this.endpoints.length; j++)
        jsPlumb.deleteEndpoint(this.endpoints[j]);
    
    this.endpoints.length = 0;
-   console.log(this.settings);
+   
   // this.setConnectors();
  //  this.updatePosition();
    
 }
 Sum.prototype.outputValue = function(){
     var outVal = 0;
-       console.log(this.endpoints);
+      
 
     for(var i=0;i<this.settings.inPos.length;i++)
     {
@@ -114,9 +114,6 @@ Sum.prototype.outputValue = function(){
     return outVal;
 }
 Sum.prototype.updatePreviousValues = function(func,value){
-    console.log(func);
-    console.log(this.previousValues);
-    console.log(this.previousValues[func]);
-    console.log(value);
+   
     this.previousValues[func]=value;
 }

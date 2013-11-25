@@ -23,9 +23,19 @@ var Scope = function(config){
     
     this.endpoints = $.extend([],this.endpoints,[]);
        
+    this.parameters = [
+        {   
+            'type' : 'plot',
+            'label' : '',
+            'value' : this.previousValues,
+            'id' : this.settings.id+'plot',
+        },
+       
+    ];
 }
 
 Scope.prototype = new Block();
-Scope.prototype.outputValue = function(y,h){
-    return this.previousValues.push(y);        
+Scope.prototype.outputValue = function(y,h,time){
+    console.log(y);
+    return this.previousValues.push([time , y]);        
 }

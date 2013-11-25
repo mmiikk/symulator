@@ -23,6 +23,7 @@ var Integrator = function(config){
 
 Integrator.prototype = new Block();
 Integrator.prototype.outputValue = function(y,h){
+    console.log(y);
     var output = this.previousValues + y*h;
     this.previousValues = output;
     return output;        

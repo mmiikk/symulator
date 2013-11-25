@@ -1,13 +1,14 @@
-var Constant = function(config){
+var Gain = function(config){
    
     var basicConfig = {
-        'id' : 'constant',
-        'name' : 'constant',
-        'type' : 'constant',
-        'in' : '0',
+        'id' : 'gain',
+        'name' : 'gain',
+        'type' : 'gain',
+        'in' : '1',
         'out' : '1',
         'left' : '0',
         'top' : '0',
+        'inPos' : [{'position':positions.left}],
 
 
     };
@@ -35,8 +36,8 @@ var Constant = function(config){
     ];
 }
 
-Constant.prototype = new Block();
-Constant.prototype.outputValue = function(y,h,time){
-    return this.previousValues.end;      
+Gain.prototype = new Block();
+Gain.prototype.outputValue = function(y,h,time){
+    return y*this.previousValues.end;      
    
 }

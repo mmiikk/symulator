@@ -116,3 +116,7 @@ button{
 .clicked{
     background:pink;
 }
+.ui-dialog-contain {
+    max-width: 1500px;
+
+}

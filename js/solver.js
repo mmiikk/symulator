@@ -2,7 +2,7 @@
     var methods;
     var connections=[];
     var objects=[];
-    var sources = ['step'];
+    var sources = ['step','constant'];
     var sourcesSmall = ['feedback'];
     var timeHorizon = 10;
     var h = 0.1;
@@ -203,22 +203,24 @@
             
             var Order = [];
             
-            Order = buildBranchBySourceType('step',Order); //Build branches as array row, where source is step
+            for(var i=0;i<sources.length;i++)
+                Order = buildBranchBySourceType(sources[i],Order); //Build branches as array row, where source is sources array element
             Order = buildBranchBySourceType('feedback',Order); //Build branches as array row, where source is feedback
                      
             orderBranchesByPriority(Order); //make Order in correct order
             
                 var  y = 0 ;
                 var time = 0;
-                var h=0.1;
+                var h=0.001;
                 //var
-                console.time('someFunction timer');
-                while(time<10)
-                    {
-                     console.log('####');
+                  console.log('####');
                       console.log('####');
                        console.log('####');
                         console.log('####'); console.log('####');
+                console.time('someFunction timer');
+                while(time<10)
+                    {
+                   
                         
                         for(var i=0; i<Order.length ; i++)
                             {
@@ -232,7 +234,7 @@
                                          //   if(obje[0].settings.type =='feedback')
                                             
                                         y=obje[0].outputValue(y,h,time);
-                                        console.log(y);
+                                       
                                         var tar =  _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
                                                     if(tar[0].settings.type==='sum')
                                                         {
@@ -248,7 +250,7 @@
                                                var obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].sourceId});
                                               // console.log(obje);
                                                y=obje[0].outputValue(y,h,time);
-                                               console.log(y);
+                                               
                                                var tar =  _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
                                                     if(tar[0].settings.type==='sum')
                                                         {
@@ -268,10 +270,11 @@
                                         
                                     }
                             }
-                            time= time+0.1;
+                            time= time+h;
+                            //console.log(y);
                   }
                        console.timeEnd('someFunction timer')     
-                    console.log(objects[4]);
+                   // console.log(objects[4]);
         
         
                 var data = [];
@@ -281,7 +284,7 @@
                         data.push([i, f[0].previousValues[i]]);
                         
                     }
-                $.plot('#plot',[data]);
+             //   $.plot('#plot',[data]);
 	},
     
     

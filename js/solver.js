@@ -211,7 +211,7 @@
             
                 var  y = 0 ;
                 var time = 0;
-                var h=0.001;
+                var h=0.5;
                 //var
                   console.log('####');
                       console.log('####');

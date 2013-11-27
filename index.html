@@ -34,6 +34,7 @@
     <script src="js/objects/constant.js"></script>
     <script src="js/objects/gain.js"></script>
     <script src="js/objects/transferFcn.js"></script>
+    <script src="js/objects/multiply.js"></script>
 
 </head>
 <body>
@@ -117,8 +118,10 @@
            
             
             <form id="propertiesForm2" >
+                
                 <input ng-repeat="input in inputs" type="{{input.type}}" min="0" max="10" value="{{input.value}}" id="{{input.id}}" data-input-name="{{input.id}}">
                 <div id="plot"> </div>
+                <a href="#"  data-role="button" id="formRefresh" ng-click="refresh()">Zapisz</a>
                 <a href="#" data-rel="back" data-role="button" ng-click="submit()">Zapisz</a>
             </form>
             

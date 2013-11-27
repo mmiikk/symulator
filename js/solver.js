@@ -190,6 +190,57 @@
         }
     }
     
+    function calculateIntegratorsInSameBranch(Order)
+    {
+        var row = 0;
+        var obje;
+        for(var i=0; i<Order.length ; i++)
+        {
+            
+            obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][0][0].sourceId});
+           // if(obje[0].settings.type!=='feedback')
+           // {
+                console.log(Order[i]);
+                for(var j=0; j<Order[i].length ; j++)
+                {
+
+                     obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].sourceId});
+                                           // console.log(obje);
+                                             //   if(obje[0].settings.type =='feedback')
+
+                     if(obje[0].settings.type === 'integrator') 
+                     {
+                         obje[0].setIntegrator(row);
+                         row++;
+                     }
+                     if(j===Order.length-1)
+                     {
+                         obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][j][0].targetId});
+                         if(obje[0].type==='scope')
+                             row=0;
+                         
+                     }
+                    console.log('integrator',obje[0].settings.id);
+
+                }
+            //}
+            
+            
+        }
+        
+        function isIntegratorInSameBranch()
+        {
+            var obje,objeend;
+        
+            for(var i=0; i<Order.length ; i++)
+            {
+                obje = _.filter(objects,function(obj){ return obj.settings.id == Order[i][0][0].sourceId});
+                objeend = _.filter(objects,function(obj){ return obj.settings.id == Order[i][Order[i].length-1][0].targetId});
+            }
+            
+        }
+    }
+    
     methods = {	
 		
 	/** Initialize
@@ -208,10 +259,12 @@
             Order = buildBranchBySourceType('feedback',Order); //Build branches as array row, where source is feedback
                      
             orderBranchesByPriority(Order); //make Order in correct order
-            
+            console.log(Order);
+            calculateIntegratorsInSameBranch(Order);
+            console.log(Order);
                 var  y = 0 ;
                 var time = 0;
-                var h=0.5;
+                var h=0.01;
                 //var
                   console.log('####');
                       console.log('####');

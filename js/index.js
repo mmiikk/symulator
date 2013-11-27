@@ -54,6 +54,12 @@ function Toolbox($scope){
             'type':'square',
                
         },
+         {
+            'id':'multiply',
+            'name':'multiply',
+            'type':'multiply',
+               
+        },
        
     ];
      
@@ -144,9 +150,11 @@ function Page($scope){
     $scope.getObject = function(id){
         return _.filter($scope.objects,function(obj){return obj.settings.id===id;});        
     }
-    
+    var ppp=0;
     $scope.addObject = function(position, toolboxWidth, id){
         //console.log(toolboxWidth);
+        var pos = [positions.bottom,positions.top];
+        
         switch (id){
             case 'step':
                     var block = new Step({'id':id+getMaxID(),
@@ -182,7 +190,9 @@ function Page($scope){
                                  'name':id + ' ' + getMaxID(),
                                  'left':parseInt(position.left)-parseInt(toolboxWidth),
                                  'top':position.top,
+                                 'outPos':[{'position':positions.right},{'position':pos[ppp]}],
                     });
+                    ppp++;
                 break;
             case 'constant':
                     var block = new Constant({'id':id+getMaxID(),
@@ -205,13 +215,20 @@ function Page($scope){
                                  'top':position.top,
                     });
                 break;
-                case 'square':
-                    var block = new Gain({'id':id+getMaxID(),
-                                 'name':id + ' ' + getMaxID(),
-                                 'left':parseInt(position.left)-parseInt(toolboxWidth),
-                                 'top':position.top,
+            case 'square':
+                var block = new Gain({'id':id+getMaxID(),
+                             'name':id + ' ' + getMaxID(),
+                             'left':parseInt(position.left)-parseInt(toolboxWidth),
+                             'top':position.top,
                     });
                 break;
+            case 'multiply':
+                var block = new Multiply({'id':id+getMaxID(),
+                             'name':id + ' ' + getMaxID(),
+                             'left':parseInt(position.left)-parseInt(toolboxWidth),
+                             'top':position.top,
+                });
+            break;
            
         }
               
@@ -300,17 +317,33 @@ function Form($scope){
     
     $scope.addInput = function(type,parameter) {
         $scope.inputs.push({type:type,value:parameter.value,id:parameter.id});
+       // $scope.$apply();
+        
+    }
+     $scope.removeInputs = function() {
+        $scope.inputs=[];
+     //   $scope.$apply();
+        
+    }
+     $scope.refresh = function() {
+         console.log($scope.inputs);
+         $scope.inputs.push({type:'type',value:'parameter.value',id:'parameter.id'});
+        //$scope.inputs=[];
+        console.log($scope.inputs);
         $scope.$apply();
         
     }
     
+    
     $scope.addPlot = function(id){
         $scope.plot = id;
-        $scope.$apply();
+        //$scope.$apply();
     }
+   
     
     $scope.submit = function()
     {
+        
         var parameters = {};
         var subparameters = {'func':[],'value':[],};
         var objectToReplaceId = $('#propertiesForm2').attr('data-id');
@@ -381,15 +414,17 @@ function Form($scope){
             }
           
         });
+        
         console.log(subparameters);
         if(subparameters.func.length > 0)
             parameters = $.extend({}, parameters, subparameters);
-        
-        console.log(parameters);
         $scope.inputs = [];
         $scope.$apply();
+        console.log(parameters);
+        
+        
         angular.element('[ng-controller=Page]').scope().updateScope(objectToReplaceId, parameters);
-        $('.ui-dialog').dialog('close');
+        
        // $('.ui-dialog').dialog('close');
     }
     
@@ -522,7 +557,7 @@ $(document).ready(function(){
    $('#propertiesbtn').bind('click',function(event,ui){
        var blockId = $('#page').find('.clicked').attr('id');
        var obj = angular.element('[ng-controller=Page]').scope().getObject(blockId);
-       
+        angular.element('[ng-controller=Form]').scope().removeInputs();
       
        
        var parameter = null;
@@ -599,28 +634,28 @@ $(document).ready(function(){
    
    
    $('#build').bind('click',function(event,ui){
-          angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'constant'  );
+         /* angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'constant'  );
        angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'300px'}, $('#toolbox').width(), 'constant'  );
         angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'gain'  );
          angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'300px'}, $('#toolbox').width(), 'gain'  );
-          angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'scope'  );
-      /*  angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'100px'}, $('#toolbox').width(), 'step'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'100px'}, $('#toolbox').width(), 'sum'  );
+          angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'scope'  );*/
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'100px',top:'200px'}, $('#toolbox').width(), 'step'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'200px',top:'200px'}, $('#toolbox').width(), 'sum'  );
       //  angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'100px'}, $('#toolbox').width(), 'sum'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'integrator'  );
        // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'100px'}, $('#toolbox').width(), 'sum'  );
        // angular.element('[ng-controller=Page]').scope().addObject( {left:'400px',top:'200px'}, $('#toolbox').width(), 'step'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'600px',top:'100px'}, $('#toolbox').width(), 'integrator'  );
-         angular.element('[ng-controller=Page]').scope().addObject( {left:'700px',top:'100px'}, $('#toolbox').width(), 'feedback'  );
-        angular.element('[ng-controller=Page]').scope().addObject( {left:'800px',top:'100px'}, $('#toolbox').width(), 'scope'  );*/
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'500px',top:'200px'}, $('#toolbox').width(), 'feedback'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'600px',top:'200px'}, $('#toolbox').width(), 'integrator'  );
+         angular.element('[ng-controller=Page]').scope().addObject( {left:'700px',top:'200px'}, $('#toolbox').width(), 'feedback'  );
+        angular.element('[ng-controller=Page]').scope().addObject( {left:'800px',top:'200px'}, $('#toolbox').width(), 'scope'  );
 //angular.element('[ng-controller=Page]').scope().addObject( {left:'300px',top:'450px'}, $('#toolbox').width(), 'integrator'  );
 //
 //
 //
 //
         //jsPlumb.connect({source:'step0',target:'sum1'});
-        /*
+        
        console.log(angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[0]);
        jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[3],
            target:angular.element('[ng-controller=Page]').scope().getObject('integrator2')[0].endpoints[0]});
@@ -635,7 +670,7 @@ $(document).ready(function(){
           jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('step0')[0].endpoints[0],
              target:angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[0]}); 
             jsPlumb.connect({source:angular.element('[ng-controller=Page]').scope().getObject('feedback3')[0].endpoints[2],
-             target:angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[1]}); */
+             target:angular.element('[ng-controller=Page]').scope().getObject('sum1')[0].endpoints[1]}); 
        
 /*
  * 
